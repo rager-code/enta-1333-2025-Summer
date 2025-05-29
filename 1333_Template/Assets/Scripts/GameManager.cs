@@ -3,32 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
-
-
 {
-
-    [SerializeField] private GridManager gridManager;
-    [SerializeField] private UnitManager unitManager;
-
-    //private void Awake()
-
+    [SerializeField] private GridManager gridManager;   // Manages the grid system
+    [SerializeField] private UnitManager unitManager;   // Manages units on the grid
+    [SerializeField] private VisualTargetPath pathFinder;   // Handles visual pathfinding
 
     private void Awake()
     {
+        // Initialize grid and reset the pathfinder field when the game starts
         gridManager.InitializeGrid();
-
+        pathFinder.ResetFeild();
     }
 
-    // Start is called before the first frame update
-   
-
-    // Update is called once per frame
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        // Listen for 'R' key press to reinitialize grid and reset pathfinder
+        if (Input.GetKeyDown(KeyCode.R))
         {
-            Awake();
-
+            gridManager.InitializeGrid();
+            pathFinder.ResetFeild();
         }
     }
 }
