@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GridManager gridManager;
     [SerializeField] private UnitManager unitManager;
+    [SerializeField] private VisualsDrawing visualsDrawing;
 
     //private void Awake()
 
@@ -16,7 +17,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         gridManager.InitializeGrid();
-
+        visualsDrawing.ResetFeild();
     }
 
     // Start is called before the first frame update

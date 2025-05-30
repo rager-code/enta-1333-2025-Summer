@@ -12,7 +12,7 @@ public class TerrainType : ScriptableObject
 
     [SerializeField] private bool Walkable = true;
 
-    [SerializeField] private int movementCost = 1;
+    public int movementCost = 1;
     // Start is called before the first frame update
 
 
