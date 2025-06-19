@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DijkstrasPathfinding : MonoBehaviour
+
+public class DijkstrasPathfinding : PathfindingClass
 {
     public List<GridNode> FindPath(GridManager gridManager, GridNode start, GridNode end, int unitWidth, int unitHeight)
-    {
+    { 
+
         List<GridNode> openSet = new List<GridNode>();
 
         Dictionary<GridNode, int> costSoFar = new Dictionary<GridNode, int>();
@@ -36,22 +38,8 @@ public class DijkstrasPathfinding : MonoBehaviour
             // Remove the current node from open set
             openSet.Remove(current);
 
-            /* Check neighbors
-            foreach (GridNode neighbor in GetNeighbors(gridManager, current))
-            {
-                if (!neighbor.Walkable) continue;
 
-                int newCost = costSoFar[current] + neighbor.Weight; // Uniform cost for Dijkstra (can replace with terrain weight)
 
-                if (!costSoFar.ContainsKey(neighbor) || newCost < costSoFar[neighbor])
-                {
-                    costSoFar[neighbor] = newCost;
-                    cameFrom[neighbor] = current;
-                    if (!openSet.Contains(neighbor))
-                        openSet.Add(neighbor);
-                }
-            }
-            */
         }
 
         // Reconstruct path
@@ -69,10 +57,15 @@ public class DijkstrasPathfinding : MonoBehaviour
 
         return path;
     }
-    /*
+
+}
+
+
     private List<GridNode> GetNeighbors(GridManager gridManager, GridNode node)
     {
+        //GridNode 
         return gridManager.GetNeighborNodes(node); // Assumes your GridManager has a GetNeighbors function
-    }*/
-    
+    }
 }
+        
+
