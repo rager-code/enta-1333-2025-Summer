@@ -4,8 +4,15 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
-    [SerializeField] private GridSettings gridSettings;
+    [SerializeField] public GridSettings gridSettings;
     [SerializeField] private TerrainType defaultTerrainType;
+
+    [SerializeField] private List<TerrainType> terrainTypes = new();
+
+    public GridNode[,] gridNodes;
+    public List<GridNode> allNodes = new();
+
+
 
     [SerializeField] private List<TerrainType> terrainTypes = new();
     public GridSettings GridSettings => gridSettings;
@@ -43,6 +50,7 @@ public class GridManager : MonoBehaviour
         }
 
         IsInitialized = true;
+
     }
     private void OnDrawGizmos()
     {
@@ -62,14 +70,6 @@ public class GridManager : MonoBehaviour
             }
         }
     }
-    public GridNode GetNode(int x, int y)
-    {
-        if (x >= 0 && x < gridSettings.GridSizeX && y >= 0 && y < gridSettings.GridSizeY)
-            return gridNodes[x, y];
-        return null;
-    }
-
-   
 
     public List<GridNode> GetAllNodes() => allNodes;
 
@@ -92,7 +92,7 @@ public class GridManager : MonoBehaviour
     }
     public GridNode GetNodeFromWorldPosition(Vector3 position)
     {
-        // Determine which axes to use based on grid orientation.
+ 
         int x = gridSettings.UseXZPlane
             ? Mathf.RoundToInt(position.x / gridSettings.NodeSize)
             : Mathf.RoundToInt(position.z / gridSettings.NodeSize);
@@ -100,11 +100,11 @@ public class GridManager : MonoBehaviour
             ? Mathf.RoundToInt(position.z / gridSettings.NodeSize)
             : Mathf.RoundToInt(position.y / gridSettings.NodeSize);
 
-        // Clamp coordinates to grid bounds.
+       
         x = Mathf.Clamp(x, 0, gridSettings.GridSizeX - 1);
         y = Mathf.Clamp(y, 0, gridSettings.GridSizeY - 1);
 
-        // Return the node at the clamped coordinates.
+       
         return GetNode(x, y);
     }
     public GridNode GetNode(Vector2Int position)
