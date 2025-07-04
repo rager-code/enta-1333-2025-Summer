@@ -13,6 +13,10 @@ MonoBehaviour:
   m_Name: Rock(TerrainType)
   m_EditorClassIdentifier: 
   terrainName: Rock
-  gizmoColour: {r: 0.4056604, g: 0.4056604, b: 0.4056604, a: 1}
+  gizmoColour: {r: 0.20959418, g: 0.24777755, b: 0.2830189, a: 0.39215687}
   walkable: 1
-  movementCost: 10
+  movementCost: 7
+  terrainPrefab: {fileID: 5273687005769174172, guid: d9046601e8594e84e96e18bec1b77f51, type: 3}
+  showGizmos: 1
+  prefabOffset: {x: 0, y: 0, z: 0}
+  prefabScale: {x: 1, y: 1, z: 1}

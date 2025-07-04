@@ -13,6 +13,10 @@ MonoBehaviour:
   m_Name: Water(TerrainType)
   m_EditorClassIdentifier: 
   terrainName: Default
-  gizmoColour: {r: 0, g: 0.3364961, b: 0.67058825, a: 1}
-  walkable: 1
-  movementCost: 15
+  gizmoColour: {r: 0, g: 0.50292397, b: 1, a: 0.39215687}
+  walkable: 0
+  movementCost: 50
+  terrainPrefab: {fileID: 5273687005769174172, guid: 10d535fd4017472458dcc3b23583a700, type: 3}
+  showGizmos: 1
+  prefabOffset: {x: 0, y: 0, z: 0}
+  prefabScale: {x: 1, y: 1, z: 1}

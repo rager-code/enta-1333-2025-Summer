@@ -4,38 +4,28 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-<<<<<<< HEAD
-
-    [SerializeField] private GridManager gridManager;
-    [SerializeField] private UnitManager unitManager;
-    [SerializeField] private VisualsDrawing visualsDrawing;
-
-    //private void Awake()
-
-=======
     [SerializeField] private GridManager gridManager;   // Manages the grid system
     [SerializeField] private UnitManager unitManager;   // Manages units on the grid
     [SerializeField] private VisualTargetPath pathFinder;   // Handles visual pathfinding
->>>>>>> 6217d9261501907b08ecf4bdfe194186b9dcd8a1
-
+    [SerializeField] private CommandTargetPath commandTargetPath;//new
     private void Awake()
     {
-        // Initialize grid and reset the pathfinder field when the game starts
+        // Initialize grid and reset the pathfinder when the game starts
         gridManager.InitializeGrid();
-<<<<<<< HEAD
-        visualsDrawing.ResetFeild();
-=======
-        pathFinder.ResetFeild();
->>>>>>> 6217d9261501907b08ecf4bdfe194186b9dcd8a1
+        pathFinder.ResetField();
+
+        //commandTargetPath.ResetField();//new
     }
 
     private void Update()
     {
-        // Listen for 'R' key press to reinitialize grid and reset pathfinder
-        if (Input.GetKeyDown(KeyCode.R))
+        // resets grid and player and enemy
+        if (Input.GetKeyDown(KeyCode.T))
         {
             gridManager.InitializeGrid();
-            pathFinder.ResetFeild();
+            pathFinder.ResetField();
+
+            //commandTargetPath.ResetField();
         }
     }
 }

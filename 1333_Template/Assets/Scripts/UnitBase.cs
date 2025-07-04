@@ -1,18 +1,37 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
-public class UnitBase : MonoBehaviour
+public abstract class UnitBase : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+
+
+    [SerializeField] protected UnitType unitType;
+
+
+
+    //public abstract void MoveTo(GridNode targetNode);
+
+    
+
+    public virtual int Width => unitType != null ? unitType.Width : 1;
+    public virtual int Height => unitType != null ? unitType.Height : 1;
+
+    // called to assign a target node to move toward
+    public virtual void MoveTo(GridNode targetNode)
     {
-        
+
+
     }
 
-    // Update is called once per frame
-    void Update()
+    // handles single-frame/tick movement update
+    public virtual void DoMove()
     {
-        
+
     }
+
+    // called every frame or tick by the RTS manager
+    public virtual void PerTick() { }
+
 }

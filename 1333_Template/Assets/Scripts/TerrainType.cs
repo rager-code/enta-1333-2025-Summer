@@ -10,24 +10,19 @@ public class TerrainType : ScriptableObject
     [SerializeField] private bool walkable = true;             // Can units walk on the terrain?
     [SerializeField] private int movementCost = 1;            // Movement cost for the terrain types
 
-<<<<<<< HEAD
+    [Header("Visual Representation")]
+    [SerializeField] private GameObject terrainPrefab;         // Prefab to instantiate for this terrain
+    [SerializeField] private bool showGizmos = true;           // Whether to show gizmos in editor
+    [SerializeField] private Vector3 prefabOffset = Vector3.zero; // Offset for prefab positioning
+    [SerializeField] private Vector3 prefabScale = Vector3.one;   // Scale for the prefab
 
-    [SerializeField] private string terrainName = "Default";
-
-    [SerializeField] private Color gizmoColor = Color.green;
-
-    [SerializeField] private bool Walkable = true;
-
-    public int movementCost = 1;
-    // Start is called before the first frame update
-
-
-    //new
-=======
-    
->>>>>>> 6217d9261501907b08ecf4bdfe194186b9dcd8a1
+    // Public properties
     public string TerrainName => terrainName;
     public Color GizmoColour => gizmoColour;
     public bool Walkable => walkable;
     public int MovementCost => movementCost;
+    public GameObject TerrainPrefab => terrainPrefab;
+    public bool ShowGizmos => showGizmos;
+    public Vector3 PrefabOffset => prefabOffset;
+    public Vector3 PrefabScale => prefabScale;
 }

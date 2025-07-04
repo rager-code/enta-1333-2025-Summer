@@ -4,15 +4,8 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
-    [SerializeField] public GridSettings gridSettings;
+    [SerializeField] private GridSettings gridSettings;
     [SerializeField] private TerrainType defaultTerrainType;
-
-    [SerializeField] private List<TerrainType> terrainTypes = new();
-
-    public GridNode[,] gridNodes;
-    public List<GridNode> allNodes = new();
-
-
 
     [SerializeField] private List<TerrainType> terrainTypes = new();
     public GridSettings GridSettings => gridSettings;
@@ -50,7 +43,6 @@ public class GridManager : MonoBehaviour
         }
 
         IsInitialized = true;
-
     }
     private void OnDrawGizmos()
     {
@@ -66,10 +58,19 @@ public class GridManager : MonoBehaviour
                 if (node == null) continue;
 
                 Gizmos.color = node.walkable ? node.terrainType.GizmoColour : Color.red;
-                Gizmos.DrawWireCube(node.WorldPosition, Vector3.one * gridSettings.NodeSize * 0.9f);
+                Gizmos.DrawCube(node.WorldPosition, Vector3.one * gridSettings.NodeSize * 0.9f);
             }
         }
     }
+    
+    public GridNode GetNode(int x, int y)
+    {
+        if (x >= 0 && x < gridSettings.GridSizeX && y >= 0 && y < gridSettings.GridSizeY)
+            return gridNodes[x, y];
+        return null;
+    }
+
+   
 
     public List<GridNode> GetAllNodes() => allNodes;
 
