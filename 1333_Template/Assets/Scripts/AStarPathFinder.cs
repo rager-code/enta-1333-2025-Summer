@@ -6,7 +6,7 @@ using UnityEngine;
  
 public class AStartPathfinding : MonoBehaviour
 {
-    public List<GridNode> FindPath(GridManager gridManager, GridNode start, GridNode end, int unitWidth, int unitHeight)
+    /*public List<GridNode> FindPath(GridManager gridManager, GridNode start, GridNode end, int unitWidth, int unitHeight)
     {
         List<GridNode> openSet = new List<GridNode>();
         Dictionary<GridNode, int> gCost = new Dictionary<GridNode, int>();
@@ -81,7 +81,7 @@ public class AStartPathfinding : MonoBehaviour
         float dx = Mathf.Abs(a.WorldPosition.x - b.WorldPosition.x);
         float dz = Mathf.Abs(a.WorldPosition.z - b.WorldPosition.z); // Assuming XZ plane
         return Mathf.RoundToInt(dx + dz);
-    }
+    }*/
 }
 
 

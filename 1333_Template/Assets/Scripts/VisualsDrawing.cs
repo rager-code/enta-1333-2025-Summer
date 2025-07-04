@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class VisualsDrawing : MonoBehaviour
 {
-    [SerializeField] private GridManager gridManager;
+
+   /* [SerializeField] private GridManager gridManager;
     [SerializeField] private AStartPathfinding pathfindingLogic;
     [SerializeField] private GameObject startPosPrefab;
     [SerializeField] private GameObject endPosPrefab;
@@ -119,5 +120,5 @@ public class VisualsDrawing : MonoBehaviour
         lineRenderer.endWidth = 0.2f;
         lineRenderer.useWorldSpace = true;
         lineRenderer.positionCount = 0;
-    }
+    }*/
 }

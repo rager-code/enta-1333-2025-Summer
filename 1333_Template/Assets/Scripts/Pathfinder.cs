@@ -7,8 +7,8 @@ using UnityEngine;
 
 public class Pathfinder : MonoBehaviour
 {
-
-    [SerializeField] private GameObject playerUnits;
+    
+   /* [SerializeField] private GameObject playerUnits;
     [SerializeField] private GameObject EndUnit;
     [SerializeField] private GridManager gridManager;
 
@@ -186,13 +186,13 @@ public class Pathfinder : MonoBehaviour
     }
     private void DrawLine(List<GridNode> connectedNodes)
     {
-        /*
+        *//*
         if (connectedNodes == null || connectedNodes.Count == 0)
         {
             Debug.LogWarning("No nodes to draw line.");
             return;
         }
-        */
+        *//*
         // Create one line object outside the loop
         GameObject lineObject = new GameObject("Algorithm Line");
         LineRenderer localLineRenderer = lineObject.AddComponent<LineRenderer>();
@@ -235,14 +235,14 @@ public class Pathfinder : MonoBehaviour
         lineRenderer.SetPosition(0, startGrid.WorldPosition);
         lineRenderer.SetPosition(1, endGrid.WorldPosition);
 
-        /*
+        *//*
         lineRenderer.positionCount = path.Count;
 
         for (int i = 0; i < path.Count; i++)
         {
             lineRenderer.SetPosition(i, path[i].WorldPosition);
         }
-        */
+        *//*
     }
 
 
@@ -260,5 +260,6 @@ public class Pathfinder : MonoBehaviour
         //Gizmos.DrawLine(spawnNode.WorldPosition, EndNode.WorldPosition);
 
         //}
-    }
+    }*/
+
 }

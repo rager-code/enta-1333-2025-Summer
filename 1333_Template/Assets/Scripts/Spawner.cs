@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private GameObject playerUnits;
+   /* [SerializeField] private GameObject playerUnits;
     [SerializeField] private GameObject EndUnit;
     [SerializeField] private GridManager gridManager;
 
@@ -77,5 +77,5 @@ public class Spawner : MonoBehaviour
         //Gizmos.DrawLine(spawnNode.WorldPosition, EndNode.WorldPosition);
 
         //}
-    }
+    }*/
 }
