@@ -9,7 +9,7 @@ public class SoundPlayer : MonoBehaviour
 
     public void Update()
     {
-        m_MyAudioSource.Play();
+        //m_MyAudioSource.Play();
 
     }
 
