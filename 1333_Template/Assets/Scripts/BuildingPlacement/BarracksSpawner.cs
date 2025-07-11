@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static GameManager;
 
 public class BarracksSpawner : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class BarracksSpawner : MonoBehaviour
     public UnitType unitType;
     public AStarPathfinding astarPathfinding;
     public VisualTargetPath visualTargetPath;
+
+    
 
     [Header("Click Controls")]
     public Camera playerCamera; // Assign your main camera
@@ -55,11 +58,15 @@ public class BarracksSpawner : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.G))
         {
             UnitPositionTracker(); // Moves ALL units to this barracks
+           
+              
+            
         }
 
         if (Input.GetKeyDown(KeyCode.F))
         {
             UnitSpawn();
+
         }
 
         // Move only units from THIS barracks
@@ -164,6 +171,7 @@ public class BarracksSpawner : MonoBehaviour
 
     public void UnitSpawn()
     {
+      
         GameObject newUnit = Instantiate(unitPrefab, spawnPoint.position, Quaternion.identity);
         UnitInstance unit = newUnit.GetComponent<UnitInstance>();
         unit.Initialize(astarPathfinding, unitType, gridManager, visualTargetPath);
@@ -171,6 +179,8 @@ public class BarracksSpawner : MonoBehaviour
         // Add the new unit to both tracking lists
         allUnits.Add(unit);
         myUnits.Add(unit);
+
+       
 
         GridNode targetNode = gridManager.GetNodeFromWorldPosition(endPoint.position);
         if (targetNode != null)

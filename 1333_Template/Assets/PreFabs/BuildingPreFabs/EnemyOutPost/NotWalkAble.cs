@@ -41,8 +41,7 @@ public class NotWalkAble : MonoBehaviour
     private GameObject currentBuilding;
     private Renderer[] buildingRenderers; // Handle multiple renderers
     private Material[] originalMaterials; // Store original materials
-    private bool canPlace = false;
-    private bool isPlaced = false;
+    
 
     // Current unwalkable dimensions for the building being placed
     private int currentUnwalkableWidth;

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class GridProcedural : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class GridProcedural : MonoBehaviour
     [SerializeField] private TerrainType grassTerrain;
     [SerializeField] private TerrainType waterTerrain;
     [SerializeField] private TerrainType rocksTerrain;
+    [SerializeField] private TerrainType tallGrassTerrain;
 
     [Header("Prefab Management")]
     [SerializeField] private Transform terrainParent; // Parent object for organization
@@ -32,6 +34,12 @@ public class GridProcedural : MonoBehaviour
     [SerializeField] private int riverLength = 20;
     [SerializeField] private int riverWidth = 2;
 
+    [Header("Tall Grass Settings")]
+    [SerializeField] private bool generateTallGrass = true;
+    [SerializeField] private float tallGrassSpawnChance = 0.15f;
+    [SerializeField] private int maxTallGrassGroupSize = 5;
+    [SerializeField] private int tallGrassMaxAttempts = 1000;
+
     [Header("Seed Settings")]
     [SerializeField] private bool useRandomSeed = true;
     [SerializeField] private int seed = 12345;
@@ -40,17 +48,19 @@ public class GridProcedural : MonoBehaviour
     [SerializeField] private bool randomizeOnStart = true;
     [SerializeField] private bool randomizeOnEnable = false;
 
+    [Header("Debug")]
+    [SerializeField] private bool enableDebugLogs = false;
+
     private float[,] noiseMap;
     private Vector2 noiseOffset;
     private Dictionary<GridNode, GameObject> nodePrefabMap = new Dictionary<GridNode, GameObject>();
+    private HashSet<GridNode> tallGrassNodes = new HashSet<GridNode>();
 
     void Start()
     {
-
         if (gridManager != null && randomizeOnStart)
         {
             StartCoroutine(GenerateTerrainCoroutine());
-            //RandomizeSeed();
         }
     }
 
@@ -88,6 +98,9 @@ public class GridProcedural : MonoBehaviour
             ClearAllPrefabs();
         }
 
+        // Clear previous tall grass tracking
+        tallGrassNodes.Clear();
+
         // Always use a new random seed for full randomization
         seed = Random.Range(0, 10000);
         Random.InitState(seed);
@@ -104,6 +117,12 @@ public class GridProcedural : MonoBehaviour
         // Add water features
         GenerateLakes();
         GenerateRivers();
+
+        // Generate tall grass if enabled
+        if (generateTallGrass && tallGrassTerrain != null)
+        {
+            GenerateTallGrass();
+        }
 
         // Instantiate prefabs for all nodes
         if (instantiatePrefabs)
@@ -265,6 +284,207 @@ public class GridProcedural : MonoBehaviour
             {
                 CreateRiverSegment(pos, riverWidth, settings);
             }
+        }
+    }
+
+    private void GenerateTallGrass()
+    {
+        if (tallGrassTerrain == null)
+        {
+            if (enableDebugLogs)
+                Debug.LogWarning("Tall Grass Terrain not assigned!");
+            return;
+        }
+
+        var grassNodes = GetAllGrassNodes();
+        var candidateNodes = new List<GridNode>(grassNodes);
+
+        int attempts = 0;
+        int tallGrassCount = 0;
+
+        while (candidateNodes.Count > 0 && attempts < tallGrassMaxAttempts)
+        {
+            attempts++;
+
+            // Pick a random candidate node
+            int randomIndex = Random.Range(0, candidateNodes.Count);
+            GridNode candidateNode = candidateNodes[randomIndex];
+
+            // Remove from candidates regardless of outcome
+            candidateNodes.RemoveAt(randomIndex);
+
+            // Check if this node can spawn tall grass
+            if (CanSpawnTallGrass(candidateNode))
+            {
+                // Randomly decide if we should spawn here
+                if (Random.Range(0f, 1f) < tallGrassSpawnChance)
+                {
+                    SpawnTallGrassAt(candidateNode);
+                    tallGrassCount++;
+
+                    // Remove nearby nodes from candidates to prevent clustering
+                    RemoveNearbyFromCandidates(candidateNode, candidateNodes);
+                }
+            }
+        }
+
+        if (enableDebugLogs)
+        {
+            Debug.Log($"Generated {tallGrassCount} tall grass patches in {attempts} attempts");
+        }
+    }
+
+    private List<GridNode> GetAllGrassNodes()
+    {
+        var allNodes = gridManager.GetAllNodes();
+        var grassNodes = new List<GridNode>();
+
+        foreach (var node in allNodes)
+        {
+            if (node.terrainType == grassTerrain)
+            {
+                grassNodes.Add(node);
+            }
+        }
+
+        return grassNodes;
+    }
+
+    private bool CanSpawnTallGrass(GridNode node)
+    {
+        // Check if node is valid grass terrain
+        if (node.terrainType != grassTerrain)
+        {
+            return false;
+        }
+
+        // Check if any adjacent nodes are water
+        var neighbors = GetNeighbors(node);
+        foreach (var neighbor in neighbors)
+        {
+            if (neighbor.terrainType == waterTerrain)
+            {
+                return false;
+            }
+        }
+
+        // Check if spawning here would create a group larger than maxGroupSize
+        if (WouldExceedGroupSize(node))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool WouldExceedGroupSize(GridNode node)
+    {
+        var tallGrassNeighbors = GetTallGrassNeighbors(node);
+
+        if (tallGrassNeighbors.Count == 0)
+        {
+            return false; // No tall grass neighbors, safe to spawn
+        }
+
+        // Find the largest connected group this node would join
+        var visited = new HashSet<GridNode>();
+        int maxGroupSize = 0;
+
+        foreach (var neighbor in tallGrassNeighbors)
+        {
+            if (!visited.Contains(neighbor))
+            {
+                int groupSize = GetConnectedGroupSize(neighbor, visited);
+                maxGroupSize = Mathf.Max(maxGroupSize, groupSize);
+            }
+        }
+
+        // Adding this node would make the group size maxGroupSize + 1
+        return (maxGroupSize + 1) > maxTallGrassGroupSize;
+    }
+
+    private int GetConnectedGroupSize(GridNode startNode, HashSet<GridNode> visited)
+    {
+        if (visited.Contains(startNode) || !tallGrassNodes.Contains(startNode))
+        {
+            return 0;
+        }
+
+        visited.Add(startNode);
+        int size = 1;
+
+        var neighbors = GetTallGrassNeighbors(startNode);
+        foreach (var neighbor in neighbors)
+        {
+            size += GetConnectedGroupSize(neighbor, visited);
+        }
+
+        return size;
+    }
+
+    private List<GridNode> GetTallGrassNeighbors(GridNode node)
+    {
+        var neighbors = GetNeighbors(node);
+        var tallGrassNeighbors = new List<GridNode>();
+
+        foreach (var neighbor in neighbors)
+        {
+            if (tallGrassNodes.Contains(neighbor))
+            {
+                tallGrassNeighbors.Add(neighbor);
+            }
+        }
+
+        return tallGrassNeighbors;
+    }
+
+    private List<GridNode> GetNeighbors(GridNode node)
+    {
+        var neighbors = new List<GridNode>();
+        var settings = gridManager.GridSettings;
+
+        // Convert world position to grid coordinates
+        int x = settings.UseXZPlane
+            ? Mathf.RoundToInt(node.WorldPosition.x / settings.NodeSize)
+            : Mathf.RoundToInt(node.WorldPosition.z / settings.NodeSize);
+        int y = settings.UseXZPlane
+            ? Mathf.RoundToInt(node.WorldPosition.z / settings.NodeSize)
+            : Mathf.RoundToInt(node.WorldPosition.y / settings.NodeSize);
+
+        // Check 4-directional neighbors (not diagonal)
+        int[,] directions = { { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } };
+
+        for (int i = 0; i < 4; i++)
+        {
+            int newX = x + directions[i, 0];
+            int newY = y + directions[i, 1];
+
+            if (newX >= 0 && newX < settings.GridSizeX &&
+                newY >= 0 && newY < settings.GridSizeY)
+            {
+                var neighbor = gridManager.GetNode(newX, newY);
+                if (neighbor != null)
+                {
+                    neighbors.Add(neighbor);
+                }
+            }
+        }
+
+        return neighbors;
+    }
+
+    private void SpawnTallGrassAt(GridNode node)
+    {
+        SetNodeTerrain(node, tallGrassTerrain);
+        tallGrassNodes.Add(node);
+    }
+
+    private void RemoveNearbyFromCandidates(GridNode center, List<GridNode> candidates)
+    {
+        var neighbors = GetNeighbors(center);
+        foreach (var neighbor in neighbors)
+        {
+            candidates.Remove(neighbor);
         }
     }
 
@@ -443,6 +663,17 @@ public class GridProcedural : MonoBehaviour
         }
     }
 
+    // Tall grass utility methods
+    public bool IsTallGrass(GridNode node)
+    {
+        return tallGrassNodes.Contains(node);
+    }
+
+    public int GetTallGrassCount()
+    {
+        return tallGrassNodes.Count;
+    }
+
     // Editor utility methods
     [ContextMenu("Randomize Seed")]
     public void RandomizeSeed()
@@ -467,6 +698,50 @@ public class GridProcedural : MonoBehaviour
         }
     }
 
+    [ContextMenu("Validate Tall Grass Groups")]
+    public void ValidateTallGrassGroups()
+    {
+        var visited = new HashSet<GridNode>();
+        var groups = new List<List<GridNode>>();
+
+        foreach (var node in tallGrassNodes)
+        {
+            if (!visited.Contains(node))
+            {
+                var group = new List<GridNode>();
+                GetConnectedGroup(node, visited, group);
+                groups.Add(group);
+            }
+        }
+
+        Debug.Log($"Found {groups.Count} tall grass groups:");
+        for (int i = 0; i < groups.Count; i++)
+        {
+            Debug.Log($"Group {i + 1}: {groups[i].Count} nodes");
+            if (groups[i].Count > maxTallGrassGroupSize)
+            {
+                Debug.LogWarning($"Group {i + 1} exceeds max size of {maxTallGrassGroupSize}!");
+            }
+        }
+    }
+
+    private void GetConnectedGroup(GridNode node, HashSet<GridNode> visited, List<GridNode> group)
+    {
+        if (visited.Contains(node) || !tallGrassNodes.Contains(node))
+        {
+            return;
+        }
+
+        visited.Add(node);
+        group.Add(node);
+
+        var neighbors = GetTallGrassNeighbors(node);
+        foreach (var neighbor in neighbors)
+        {
+            GetConnectedGroup(neighbor, visited, group);
+        }
+    }
+
     private void OnValidate()
     {
         // Clamp values to reasonable ranges
@@ -481,11 +756,17 @@ public class GridProcedural : MonoBehaviour
         numberOfRivers = Mathf.Max(0, numberOfRivers);
         riverLength = Mathf.Max(1, riverLength);
         riverWidth = Mathf.Max(1, riverWidth);
+
+        // Tall grass validation
+        tallGrassSpawnChance = Mathf.Clamp01(tallGrassSpawnChance);
+        maxTallGrassGroupSize = Mathf.Max(1, maxTallGrassGroupSize);
+        tallGrassMaxAttempts = Mathf.Max(100, tallGrassMaxAttempts);
     }
 
     private void OnDestroy()
     {
         // Clean up references
         nodePrefabMap.Clear();
+        tallGrassNodes.Clear();
     }
 }

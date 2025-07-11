@@ -514,6 +514,7 @@ MonoBehaviour:
   grassTerrain: {fileID: 11400000, guid: b70c3f97805062148b10cb660c3d43fb, type: 2}
   waterTerrain: {fileID: 11400000, guid: c263c4d3f5d37df4585cb61e33c6e454, type: 2}
   rocksTerrain: {fileID: 11400000, guid: d9b484935110eef4781f549b7f532cb8, type: 2}
+  tallGrassTerrain: {fileID: 11400000, guid: e72cc63dbdecf1448b922370c058c426, type: 2}
   terrainParent: {fileID: 0}
   instantiatePrefabs: 1
   clearExistingPrefabs: 1
@@ -528,10 +529,15 @@ MonoBehaviour:
   numberOfRivers: 2
   riverLength: 30
   riverWidth: 5
+  generateTallGrass: 1
+  tallGrassSpawnChance: 0.25
+  maxTallGrassGroupSize: 10
+  tallGrassMaxAttempts: 500
   useRandomSeed: 1
   seed: 12345
   randomizeOnStart: 1
   randomizeOnEnable: 0
+  enableDebugLogs: 0
 --- !u!4 &441796776
 Transform:
   m_ObjectHideFlags: 0
@@ -1108,6 +1114,9 @@ MonoBehaviour:
   unitManager: {fileID: 0}
   pathFinder: {fileID: 559085126}
   commandTargetPath: {fileID: 0}
+  soundEffects:
+  - {fileID: 8300000, guid: 3351d999ed85fee4cba3107407705c22, type: 3}
+  - {fileID: 8300000, guid: e38f656927a41e340b09a088d04bfa16, type: 3}
 --- !u!114 &919562222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1486,12 +1495,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1399394151}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 7, y: 0, z: 7}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalScale: {x: 1.5, y: 0, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1975170953}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1735850175 stripped
 GameObject:
@@ -1540,7 +1549,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 0, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1399394155}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1975170954
@@ -1714,7 +1724,6 @@ SceneRoots:
   - {fileID: 1975170953}
   - {fileID: 559085125}
   - {fileID: 961000932}
-  - {fileID: 1399394155}
   - {fileID: 840646021}
   - {fileID: 987334931}
   - {fileID: 1139959168}
