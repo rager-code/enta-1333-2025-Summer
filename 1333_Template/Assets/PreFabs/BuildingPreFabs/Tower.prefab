@@ -91,6 +91,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildingPrefab: {fileID: 7512183755618778795}
+  buildingWidth: 4
+  buildingHeight: 4
+  customUnwalkableWidth: 4
+  customUnwalkableHeight: 4
+  useCustomUnwalkableArea: 0
+  buildingTypeLimits: []
+  gridManager: {fileID: 0}
 --- !u!1001 &8822344217839207970
 PrefabInstance:
   m_ObjectHideFlags: 0

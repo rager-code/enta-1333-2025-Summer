@@ -24,11 +24,11 @@ public class UnitInstance : UnitBase
     public List<GridNode> CurrentPath => currentPath;
 
     //private void Start()
-    
-        
-        //UnitManager.Instance.allUnitsList.Add(this);
-       // Debug.Log($"{name} registered to UnitSelectionManager.");
-    
+
+
+    //UnitManager.Instance.allUnitsList.Add(this);
+    // Debug.Log($"{name} registered to UnitSelectionManager.");
+
 
     public void Initialize(AStarPathfinding pathfinder, UnitType unitType, GridManager grid, VisualTargetPath pathFinderVis)
     {
@@ -43,12 +43,12 @@ public class UnitInstance : UnitBase
     {
 
         StartCoroutine(vPath.GeneratePathTo(targetNode, this));
-        
-       
-         
-         
-         
-         
+
+
+
+
+
+
         // validate input
         if (pathfinder == null || targetNode == null)
         {
@@ -58,7 +58,7 @@ public class UnitInstance : UnitBase
 
         // find the start node from current world position
         GridNode startNode = gridManager.GetNodeFromWorldPosition(transform.position);
-       
+
 
         // generate A* path for the uunit to follow
         int unitWidth = unitType.Width;    // example - ensure these exist
@@ -87,7 +87,7 @@ public class UnitInstance : UnitBase
         {
             Debug.LogWarning($"{name} could not find path to target.");
         }
-        
+
     }
 
     public void StartPathMovement(List<GridNode> path)
@@ -98,6 +98,30 @@ public class UnitInstance : UnitBase
         isMoving = true;
 
         Debug.Log($"{name} is beginning movement along path.");
+    }
+
+    public void StopMoving()
+    {
+        // stop all movement and clear path
+        isMoving = false;
+        pathIndex = 0;
+
+        // clear the current path
+        if (currentPath != null)
+        {
+            currentPath.Clear();
+        }
+
+        // clear visual path if it exists
+        if (vPath != null)
+        {
+            vPath.DrawPath(new List<GridNode>());
+        }
+
+        // set state back to idle
+        state = UnitState.Idle;
+
+        Debug.Log($"{name} movement stopped.");
     }
 
     public override void DoMove()

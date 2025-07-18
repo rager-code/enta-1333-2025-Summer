@@ -7,11 +7,22 @@ public class MainMenu : MonoBehaviour
 {
     public void  PlayGame()
     {
-        SceneManager.LoadScene("AidenRTSScene");
+      
+        //LoadingScreen();
+        LoadingSceenManager.instance.SwitchToScene(1);
+       
     }
     public void QuitGame()
     {
         Debug.Log("Game Closed");
         Application.Quit();
     }
+    public void LoadingScreen()
+    {
+
+        SceneManager.LoadScene("AidenRTSScene");
+    }
+
 }
+   
+

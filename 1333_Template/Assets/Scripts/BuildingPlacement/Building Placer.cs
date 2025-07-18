@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.iOS;
 
 public class BuildingPlacer : MonoBehaviour
 {
@@ -468,5 +469,9 @@ public class BuildingPlacer : MonoBehaviour
     {
         buildingWidth = width;
         buildingHeight = height;
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.LogWarning("Collider Works");
     }
 }

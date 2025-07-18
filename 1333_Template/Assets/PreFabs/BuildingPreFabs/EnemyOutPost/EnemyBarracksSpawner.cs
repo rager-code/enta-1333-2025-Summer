@@ -20,8 +20,10 @@ public class EnemyBarracksSpawner : MonoBehaviour
     public float spawnInterval = 5f; // Time between automatic spawns
     public int maxUnits = 10; // Maximum units this barracks can have
 
-    [Header("Random Target Settings")]
-    public int randomTargetRange = 15; // Range for random target selection from spawn point
+    [Header("Target Prefabs")]
+    public List<GameObject> targetPrefabs = new List<GameObject>(); // List of target prefabs to attack
+    public bool useRandomTargetSelection = true; // Whether to randomly select targets or use all
+    public float retargetInterval = 10f; // Time between retargeting units
 
     // Static list to track ALL enemy units from ALL enemy barracks
     private static List<UnitInstance> allEnemyUnits = new List<UnitInstance>();
@@ -29,7 +31,7 @@ public class EnemyBarracksSpawner : MonoBehaviour
     private List<UnitInstance> myEnemyUnits = new List<UnitInstance>();
 
     private float lastSpawnTime;
-    private float lastRandomMoveTime;
+    private float lastRetargetTime;
 
     private void Start()
     {
@@ -51,7 +53,7 @@ public class EnemyBarracksSpawner : MonoBehaviour
         }
 
         lastSpawnTime = Time.time;
-        lastRandomMoveTime = Time.time;
+        lastRetargetTime = Time.time;
     }
 
     private void Update()
@@ -66,11 +68,11 @@ public class EnemyBarracksSpawner : MonoBehaviour
             }
         }
 
-        // Random movement every 2 seconds
-        if (Time.time - lastRandomMoveTime > 2f)
+        // Retarget units periodically
+        if (Time.time - lastRetargetTime > retargetInterval)
         {
-            MoveUnitsRandomly();
-            lastRandomMoveTime = Time.time;
+            RetargetUnits();
+            lastRetargetTime = Time.time;
         }
 
         // Manual keyboard controls for testing
@@ -176,27 +178,94 @@ public class EnemyBarracksSpawner : MonoBehaviour
         allEnemyUnits.Add(unit);
         myEnemyUnits.Add(unit);
 
-        // Get a random target node instead of the fixed enemy target point
-        GridNode spawnNode = gridManager.GetNodeFromWorldPosition(enemySpawnPoint.position);
-        GridNode randomTargetNode = GetRandomNodeWithinRange(spawnNode, randomTargetRange);
+        // Get a target prefab instead of random node
+        GameObject targetPrefab = GetTargetPrefab();
 
-        if (randomTargetNode != null)
+        if (targetPrefab != null)
         {
-            unit.MoveTo(randomTargetNode);
-            Debug.Log($"Spawned new enemy unit {unit.name} and moving to random target {randomTargetNode}");
-        }
-        else
-        {
-            // Fallback to original target if no random node found
-            GridNode fallbackTargetNode = gridManager.GetNodeFromWorldPosition(enemyTargetPoint.position);
-            if (fallbackTargetNode != null)
+            GridNode targetNode = gridManager.GetNodeFromWorldPosition(targetPrefab.transform.position);
+            if (targetNode != null)
             {
-                unit.MoveTo(fallbackTargetNode);
-                Debug.Log($"Spawned new enemy unit {unit.name} and moving to fallback target {fallbackTargetNode}");
+                unit.MoveTo(targetNode);
+                Debug.Log($"Spawned new enemy unit {unit.name} and moving to target prefab {targetPrefab.name}");
             }
             else
             {
-                Debug.Log("Couldn't find any valid target node for spawned unit");
+                Debug.Log($"Couldn't find valid node for target prefab {targetPrefab.name}");
+                // Fallback to original target point
+                FallbackToOriginalTarget(unit);
+            }
+        }
+        else
+        {
+            Debug.Log("No target prefabs assigned, using fallback target");
+            // Fallback to original target if no prefabs assigned
+            FallbackToOriginalTarget(unit);
+        }
+    }
+
+    private void FallbackToOriginalTarget(UnitInstance unit)
+    {
+        GridNode fallbackTargetNode = gridManager.GetNodeFromWorldPosition(enemyTargetPoint.position);
+        if (fallbackTargetNode != null)
+        {
+            unit.MoveTo(fallbackTargetNode);
+            Debug.Log($"Moving enemy unit {unit.name} to fallback target {fallbackTargetNode}");
+        }
+        else
+        {
+            Debug.Log("Couldn't find any valid target node for spawned unit");
+        }
+    }
+
+    // Get a target prefab based on selection method
+    private GameObject GetTargetPrefab()
+    {
+        if (targetPrefabs == null || targetPrefabs.Count == 0)
+        {
+            return null;
+        }
+
+        // Remove null references
+        targetPrefabs.RemoveAll(prefab => prefab == null);
+
+        if (targetPrefabs.Count == 0)
+        {
+            return null;
+        }
+
+        if (useRandomTargetSelection)
+        {
+            // Return a random target prefab
+            int randomIndex = Random.Range(0, targetPrefabs.Count);
+            return targetPrefabs[randomIndex];
+        }
+        else
+        {
+            // Return the first available target prefab
+            return targetPrefabs[0];
+        }
+    }
+
+    // Retarget existing units to new prefab targets
+    private void RetargetUnits()
+    {
+        myEnemyUnits.RemoveAll(unit => unit == null);
+
+        foreach (UnitInstance unit in myEnemyUnits)
+        {
+            if (unit != null)
+            {
+                GameObject targetPrefab = GetTargetPrefab();
+                if (targetPrefab != null)
+                {
+                    GridNode targetNode = gridManager.GetNodeFromWorldPosition(targetPrefab.transform.position);
+                    if (targetNode != null)
+                    {
+                        unit.MoveTo(targetNode);
+                        Debug.Log($"Retargeting enemy unit {unit.name} to prefab {targetPrefab.name}");
+                    }
+                }
             }
         }
     }
@@ -243,57 +312,38 @@ public class EnemyBarracksSpawner : MonoBehaviour
         Debug.Log($"Enemy spawn interval set to: {interval} seconds");
     }
 
-    // Method to set random target range
-    public void SetRandomTargetRange(int range)
+    // Method to set retarget interval
+    public void SetRetargetInterval(float interval)
     {
-        randomTargetRange = range;
-        Debug.Log($"Enemy random target range set to: {range} nodes");
+        retargetInterval = interval;
+        Debug.Log($"Enemy retarget interval set to: {interval} seconds");
     }
 
-    // Move all units randomly within 5 nodes
-    private void MoveUnitsRandomly()
+    // Method to add a target prefab
+    public void AddTargetPrefab(GameObject prefab)
     {
-        myEnemyUnits.RemoveAll(unit => unit == null);
-
-        foreach (UnitInstance unit in myEnemyUnits)
+        if (prefab != null && !targetPrefabs.Contains(prefab))
         {
-            if (unit != null)
-            {
-                GridNode currentNode = gridManager.GetNodeFromWorldPosition(unit.transform.position);
-                if (currentNode != null)
-                {
-                    GridNode randomNode = GetRandomNodeWithinRange(currentNode, 15);
-                    if (randomNode != null)
-                    {
-                        unit.MoveTo(randomNode);
-                    }
-                }
-            }
+            targetPrefabs.Add(prefab);
+            Debug.Log($"Added target prefab: {prefab.name}");
         }
     }
 
-    // Get random walkable node within range
-    private GridNode GetRandomNodeWithinRange(GridNode centerNode, int range)
+    // Method to remove a target prefab
+    public void RemoveTargetPrefab(GameObject prefab)
     {
-        if (centerNode == null) return null;
-
-        // Get center position in grid coordinates
-        Vector3 centerPos = centerNode.WorldPosition;
-        int centerX = Mathf.RoundToInt(centerPos.x / gridManager.GridSettings.NodeSize);
-        int centerY = Mathf.RoundToInt(centerPos.z / gridManager.GridSettings.NodeSize);
-
-        for (int i = 0; i < 20; i++) // Max 20 attempts
+        if (targetPrefabs.Contains(prefab))
         {
-            int randomX = centerX + Random.Range(-range, range + 1);
-            int randomY = centerY + Random.Range(-range, range + 1);
-
-            GridNode node = gridManager.GetNode(randomX, randomY);
-            if (node != null && node.walkable)
-            {
-                return node;
-            }
+            targetPrefabs.Remove(prefab);
+            Debug.Log($"Removed target prefab: {prefab.name}");
         }
-        return null;
+    }
+
+    // Method to clear all target prefabs
+    public void ClearTargetPrefabs()
+    {
+        targetPrefabs.Clear();
+        Debug.Log("Cleared all target prefabs");
     }
 
     // Optional: Method to get all currently active enemy units from ALL enemy barracks
@@ -355,11 +405,23 @@ public class EnemyBarracksSpawner : MonoBehaviour
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireCube(enemySpawnPoint.position, Vector3.one * 0.5f);
+        }
 
-            // Draw range indicator for random target selection
-            Gizmos.color = Color.yellow;
-            float rangeSize = randomTargetRange * (gridManager != null ? gridManager.GridSettings.NodeSize : 1f);
-            Gizmos.DrawWireCube(enemySpawnPoint.position, Vector3.one * rangeSize);
+        // Draw lines to target prefabs
+        if (targetPrefabs != null && targetPrefabs.Count > 0)
+        {
+            Gizmos.color = Color.magenta;
+            foreach (GameObject target in targetPrefabs)
+            {
+                if (target != null)
+                {
+                    Gizmos.DrawWireSphere(target.transform.position, 0.3f);
+                    if (enemySpawnPoint != null)
+                    {
+                        Gizmos.DrawLine(enemySpawnPoint.position, target.transform.position);
+                    }
+                }
+            }
         }
     }
 }

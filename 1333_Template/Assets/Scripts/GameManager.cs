@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     {
        spawnPlayerUnit,
        BackGroundSounds,
+       Music,
 
     }
     [Header("Sounds")]
@@ -28,7 +29,7 @@ public class GameManager : MonoBehaviour
         // Initialize grid and reset the pathfinder when the game starts
         gridManager.InitializeGrid();
         pathFinder.ResetField();
-
+       
         //commandTargetPath.ResetField();//new
     }
 
@@ -53,6 +54,7 @@ public class GameManager : MonoBehaviour
     }
     public void Start()
     {
+        
         //music here
         PlaySound(soundsNames.BackGroundSounds);
     }
