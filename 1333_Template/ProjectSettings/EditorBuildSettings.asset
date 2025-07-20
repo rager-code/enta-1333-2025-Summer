@@ -11,6 +11,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/1333_RTS/StudentWork/Scenes/AidenRTSScene.unity
     guid: 8fd744a5c89906e43aaca09b4f71463a
+  - enabled: 1
+    path: Assets/1333_RTS/StudentWork/Scenes/Win.unity
+    guid: a1bbd4cf01444924891d02cc2888b299
+  - enabled: 1
+    path: Assets/1333_RTS/StudentWork/Scenes/Lose.unity
+    guid: 2f371411ef278da4db735d5b18669aeb
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

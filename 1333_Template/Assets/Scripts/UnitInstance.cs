@@ -11,6 +11,8 @@ public class UnitInstance : UnitBase
     [SerializeField] private ParticleSystem hurtParticles; // hit feedback
     [SerializeField] public VisualTargetPath vPath; // draws the path visually ----was visual path
 
+    
+
     private GridManager gridManager;
     protected AStarPathfinding pathfinder;
 
@@ -23,11 +25,8 @@ public class UnitInstance : UnitBase
     public bool IsMoving => isMoving;
     public List<GridNode> CurrentPath => currentPath;
 
-    //private void Start()
-
-
-    //UnitManager.Instance.allUnitsList.Add(this);
-    // Debug.Log($"{name} registered to UnitSelectionManager.");
+    
+   
 
 
     public void Initialize(AStarPathfinding pathfinder, UnitType unitType, GridManager grid, VisualTargetPath pathFinderVis)

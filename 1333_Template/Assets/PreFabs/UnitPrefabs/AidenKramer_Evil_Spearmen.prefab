@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8425695836301005789}
   - component: {fileID: -4420614429448986125}
   - component: {fileID: 2695171682376178421}
+  - component: {fileID: 1750928824693806260}
   m_Layer: 0
   m_Name: AidenKramer_Evil_Spearmen
   m_TagString: Unit
@@ -66,6 +67,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+--- !u!114 &1750928824693806260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4675669948239745770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e8fd90f79db4794082c1404a1b0d4d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 0
+  healthSlider: {fileID: 1258765528908158241}
 --- !u!1001 &379015010022464475
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -183,6 +199,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+--- !u!114 &1258765528908158241 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1457618926887096058, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+  m_PrefabInstance: {fileID: 379015010022464475}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &5242969891642740282 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5584548690959341025, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}

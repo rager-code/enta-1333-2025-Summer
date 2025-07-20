@@ -39,6 +39,16 @@ public class GameManager : MonoBehaviour
         {
             PlaySound(soundsNames.spawnPlayerUnit);
         }
+
+        if (Input.GetKeyUp(KeyCode.N))
+        {
+            SceneManager.LoadScene("Win");
+        }
+
+        if (Input.GetKeyUp(KeyCode.M))
+        {
+            SceneManager.LoadScene("Lose");
+        }
     }
     public void PlaySound(soundsNames name)
     {

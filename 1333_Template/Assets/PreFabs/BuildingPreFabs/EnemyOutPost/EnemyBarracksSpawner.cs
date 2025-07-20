@@ -13,6 +13,15 @@ public class EnemyBarracksSpawner : MonoBehaviour
     public AStarPathfinding astarPathfinding;
     public VisualTargetPath visualTargetPath;
 
+
+    [Header("Castle Targeting")]
+    public bool waitForCastle = true; // Wait for castle before spawning
+    public bool onlySpawnAfterCastle = true; // Only spawn units after castle is placed
+
+    private GameObject currentCastle;
+    private bool castleFound = false;
+
+
     [Header("AI Controls")]
     public Camera playerCamera; // Assign your main camera
     public LayerMask groundLayerMask = 1; // Layer mask for ground/walkable areas
@@ -35,6 +44,7 @@ public class EnemyBarracksSpawner : MonoBehaviour
 
     private void Start()
     {
+
         if (gridManager == null)
         {
             gridManager = FindAnyObjectByType<GridManager>();
@@ -54,6 +64,52 @@ public class EnemyBarracksSpawner : MonoBehaviour
 
         lastSpawnTime = Time.time;
         lastRetargetTime = Time.time;
+
+        CastleManager.OnCastlePlaced += OnCastlePlaced;
+        CastleManager.OnCastleDestroyed += OnCastleDestroyed;
+
+        // Check if castle already exists
+        if (CastleManager.HasCastle())
+        {
+            OnCastlePlaced(CastleManager.CurrentCastle);
+        }
+    }
+    private void FindAndAddCastle()
+    {
+        // Try to find castle by name first
+        GameObject castle = GameObject.Find("Castle");
+
+        // If not found by name, try finding by tag (make sure to tag your castle with "Castle")
+        if (castle == null)
+        {
+            castle = GameObject.FindGameObjectWithTag("Castle");
+        }
+
+        // If still not found, try finding any object with "castle" in the name (case insensitive)
+        if (castle == null)
+        {
+            GameObject[] allObjects = FindObjectsOfType<GameObject>();
+            foreach (GameObject obj in allObjects)
+            {
+                if (obj.name.ToLower().Contains("castle"))
+                {
+                    castle = obj;
+                    break;
+                }
+            }
+        }
+
+        if (castle != null)
+        {
+            // Clear existing targets and add the castle
+            targetPrefabs.Clear();
+            targetPrefabs.Add(castle);
+            Debug.Log($"Found and added castle: {castle.name} at position {castle.transform.position}");
+        }
+        else
+        {
+            Debug.LogWarning("Could not find castle prefab! Make sure it exists in the scene and is named 'Castle' or tagged with 'Castle'");
+        }
     }
 
     private void Update()
@@ -102,6 +158,17 @@ public class EnemyBarracksSpawner : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.M))
         {
             ClearMyEnemyUnits();
+        }
+        bool canSpawn = !onlySpawnAfterCastle || castleFound;
+
+        // Automatic spawning based on interval
+        if (enableAIMovement && canSpawn && Time.time - lastSpawnTime > spawnInterval)
+        {
+            if (myEnemyUnits.Count < maxUnits)
+            {
+                SpawnEnemyUnit();
+                lastSpawnTime = Time.time;
+            }
         }
     }
 
@@ -424,4 +491,53 @@ public class EnemyBarracksSpawner : MonoBehaviour
             }
         }
     }
+    private void OnDestroy()
+    {
+        // Unsubscribe from events to prevent memory leaks
+        CastleManager.OnCastlePlaced -= OnCastlePlaced;
+        CastleManager.OnCastleDestroyed -= OnCastleDestroyed;
+    }
+
+    private void OnCastlePlaced(GameObject castle)
+    {
+        currentCastle = castle;
+        castleFound = true;
+
+        // Clear existing targets and add the castle
+        targetPrefabs.Clear();
+        targetPrefabs.Add(castle);
+
+        Debug.Log($"Enemy barracks {name} now targeting castle at: {castle.transform.position}");
+
+        // Retarget existing units to the castle
+        RetargetUnitsToCurrentCastle();
+    }
+    private void OnCastleDestroyed()
+    {
+        currentCastle = null;
+        castleFound = false;
+        targetPrefabs.Clear();
+
+        Debug.Log($"Enemy barracks {name} lost castle target");
+    }
+    private void RetargetUnitsToCurrentCastle()
+    {
+        if (currentCastle == null) return;
+
+        myEnemyUnits.RemoveAll(unit => unit == null);
+
+        GridNode castleNode = gridManager.GetNodeFromWorldPosition(currentCastle.transform.position);
+        if (castleNode != null)
+        {
+            foreach (UnitInstance unit in myEnemyUnits)
+            {
+                if (unit != null)
+                {
+                    unit.MoveTo(castleNode);
+                    Debug.Log($"Retargeting {unit.name} to newly placed castle");
+                }
+            }
+        }
+    }
+
 }

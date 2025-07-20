@@ -22,6 +22,10 @@ public class MainMenu : MonoBehaviour
 
         SceneManager.LoadScene("AidenRTSScene");
     }
+    public void RestartGame() //New
+    {
+        SceneManager.LoadScene("Main Menu");
+    }
 
 }
    
