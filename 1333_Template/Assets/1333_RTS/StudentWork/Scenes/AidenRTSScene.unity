@@ -498,8 +498,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabsToSpawn:
   - prefab: {fileID: 8990080377736291917, guid: a5930922ee5e86745943fcd99916771f, type: 3}
-    width: 4
-    height: 4
+    width: 20
+    height: 20
     spawnWeight: 10
   numberOfPrefabsToSpawn: 1
   spawnOnStart: 1
@@ -1256,7 +1256,7 @@ MonoBehaviour:
     buildingHeight: 8
     unwalkableWidth: 8
     unwalkableHeight: 8
-    maxBuildingOfType: 2
+    maxBuildingOfType: 1
   - prefab: {fileID: 6041842344366963134, guid: a944170b0f2404f40a5c9c844f4285f8, type: 3}
     buildingWidth: 3
     buildingHeight: 5

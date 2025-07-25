@@ -127,7 +127,7 @@ public class EnemyBarracksSpawner : MonoBehaviour
         // Retarget units periodically
         if (Time.time - lastRetargetTime > retargetInterval)
         {
-            RetargetUnits();
+            //RetargetUnits();
             lastRetargetTime = Time.time;
         }
 
@@ -315,6 +315,7 @@ public class EnemyBarracksSpawner : MonoBehaviour
     }
 
     // Retarget existing units to new prefab targets
+    /*
     private void RetargetUnits()
     {
         myEnemyUnits.RemoveAll(unit => unit == null);
@@ -336,7 +337,7 @@ public class EnemyBarracksSpawner : MonoBehaviour
             }
         }
     }
-
+    */
     // Method to move only units spawned by THIS enemy barracks
     public void MoveMyEnemyUnitsOnly()
     {

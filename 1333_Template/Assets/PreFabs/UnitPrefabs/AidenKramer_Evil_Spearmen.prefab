@@ -66,7 +66,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a3fbd275c80b7e498fb911efc002743, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  moveSpeed: 15
 --- !u!114 &1750928824693806260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82,6 +82,8 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   healthSlider: {fileID: 1258765528908158241}
+  mCamera: {fileID: 0}
+  healthBarTransform: {fileID: 0}
 --- !u!1001 &379015010022464475
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -90,6 +92,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8425695836301005789}
     m_Modifications:
+    - target: {fileID: 4406048121314367796, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4680074129157389658, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4680074129157389658, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4680074129157389658, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5326915515217490999, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
       propertyPath: m_Name
       value: HealthUI
@@ -128,15 +146,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5584548690959341025, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.01
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5584548690959341025, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.01
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5584548690959341025, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.01
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5584548690959341025, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
       propertyPath: m_LocalPosition.x

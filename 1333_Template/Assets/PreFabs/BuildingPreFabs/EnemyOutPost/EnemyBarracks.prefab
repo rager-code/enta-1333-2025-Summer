@@ -49,11 +49,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyUnitPrefab: {fileID: 4675669948239745770, guid: 7504777e80a374245885821645299522, type: 3}
   enemySpawnPoint: {fileID: 8959034235341066908}
-  enemyTargetPoint: {fileID: 6454809974286024056}
+  enemyTargetPoint: {fileID: 3830264127516560809, guid: 657f9a22891700e4dba5a53bfd1c6bf1, type: 3}
   gridManager: {fileID: 0}
   enemyUnitType: {fileID: 11400000, guid: b015057409541674fbfa1b5100330457, type: 2}
   astarPathfinding: {fileID: 0}
   visualTargetPath: {fileID: 0}
+  waitForCastle: 1
+  onlySpawnAfterCastle: 1
   playerCamera: {fileID: 0}
   groundLayerMask:
     serializedVersion: 2
@@ -61,8 +63,7 @@ MonoBehaviour:
   enableAIMovement: 1
   spawnInterval: 2
   maxUnits: 2
-  targetPrefabs:
-  - {fileID: 5287982606913193149, guid: 7c4f00ec1f9a8ba40a681e6c7fb980ea, type: 3}
+  targetPrefabs: []
   useRandomTargetSelection: 1
   retargetInterval: 10
 --- !u!1 &7639478873681605478
