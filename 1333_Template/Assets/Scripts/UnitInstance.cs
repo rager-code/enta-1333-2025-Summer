@@ -40,6 +40,9 @@ public class UnitInstance : UnitBase
 
     public override void MoveTo(GridNode targetNode)
     {
+        if (targetNode == null) return;
+
+        Debug.LogError(vPath);
 
         StartCoroutine(vPath.GeneratePathTo(targetNode, this));
 

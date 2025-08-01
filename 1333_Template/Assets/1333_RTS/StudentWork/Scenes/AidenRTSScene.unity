@@ -2005,10 +2005,10 @@ MonoBehaviour:
     unwalkableHeight: 7
     maxBuildingOfType: 1
   - prefab: {fileID: 5287982606913193149, guid: 7c4f00ec1f9a8ba40a681e6c7fb980ea, type: 3}
-    buildingWidth: 8
-    buildingHeight: 8
-    unwalkableWidth: 8
-    unwalkableHeight: 8
+    buildingWidth: 0
+    buildingHeight: 0
+    unwalkableWidth: 0
+    unwalkableHeight: 0
     maxBuildingOfType: 1
   - prefab: {fileID: 6041842344366963134, guid: a944170b0f2404f40a5c9c844f4285f8, type: 3}
     buildingWidth: 0
@@ -2105,6 +2105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1e7ff0039c1bbb4b8106fa00a63a7fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Castle: {fileID: 5287982606913193149, guid: 7c4f00ec1f9a8ba40a681e6c7fb980ea, type: 3}
 --- !u!4 &1212269859
 Transform:
   m_ObjectHideFlags: 0

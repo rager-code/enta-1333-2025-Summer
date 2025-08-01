@@ -3,7 +3,18 @@ using System;
 
 public class CastleManager : MonoBehaviour
 {
-    public static event Action<GameObject> OnCastlePlaced;
+    public static CastleManager Instance;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    public GameObject Castle;
+
+
+
+    /*public static event Action<GameObject> OnCastlePlaced;
     public static event Action OnCastleDestroyed;
 
     public static GameObject CurrentCastle { get; private set; }
@@ -25,5 +36,5 @@ public class CastleManager : MonoBehaviour
     public static bool HasCastle()
     {
         return CurrentCastle != null;
-    }
+    }*/
 }

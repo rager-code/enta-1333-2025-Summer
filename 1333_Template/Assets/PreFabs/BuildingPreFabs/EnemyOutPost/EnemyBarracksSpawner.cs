@@ -65,14 +65,14 @@ public class EnemyBarracksSpawner : MonoBehaviour
         lastSpawnTime = Time.time;
         lastRetargetTime = Time.time;
 
-        CastleManager.OnCastlePlaced += OnCastlePlaced;
+        /*CastleManager.OnCastlePlaced += OnCastlePlaced;
         CastleManager.OnCastleDestroyed += OnCastleDestroyed;
 
         // Check if castle already exists
         if (CastleManager.HasCastle())
         {
             OnCastlePlaced(CastleManager.CurrentCastle);
-        }
+        }*/
     }
     private void FindAndAddCastle()
     {
@@ -246,11 +246,17 @@ public class EnemyBarracksSpawner : MonoBehaviour
         myEnemyUnits.Add(unit);
 
         // Get a target prefab instead of random node
-        GameObject targetPrefab = GetTargetPrefab();
+        //GameObject targetPrefab = GetTargetPrefab()
+        GameObject targetPrefab = CastleManager.Instance.Castle;
+
+        Debug.Log($"SETTING ENEMY UNIT TO {targetPrefab}: NODE {gridManager.GetNodeFromWorldPosition(targetPrefab.transform.position)}");
 
         if (targetPrefab != null)
         {
             GridNode targetNode = gridManager.GetNodeFromWorldPosition(targetPrefab.transform.position);
+
+            Debug.LogWarning(targetNode.WorldPosition);
+            Debug.LogWarning(targetNode.walkable);
             if (targetNode != null)
             {
                 unit.MoveTo(targetNode);
@@ -492,13 +498,13 @@ public class EnemyBarracksSpawner : MonoBehaviour
             }
         }
     }
-    private void OnDestroy()
+    /*private void OnDestroy()
     {
         // Unsubscribe from events to prevent memory leaks
         CastleManager.OnCastlePlaced -= OnCastlePlaced;
         CastleManager.OnCastleDestroyed -= OnCastleDestroyed;
     }
-
+*/
     private void OnCastlePlaced(GameObject castle)
     {
         currentCastle = castle;

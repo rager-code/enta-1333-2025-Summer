@@ -388,8 +388,13 @@ public class BuildingPlacer : MonoBehaviour
 
     void PlaceBuilding()
     {
-        // Set the nodes under the building to not walkable
-        SetNodesUnwalkable(currentBuilding.transform.position);
+        if (buildingPrefab.gameObject.CompareTag("Castle"))
+        {
+            CastleManager.Instance.Castle = currentBuilding;
+        }
+
+         // Set the nodes under the building to not walkable
+         SetNodesUnwalkable(currentBuilding.transform.position);
 
         // Clear property blocks to restore original appearance
         if (buildingRenderers != null)
@@ -411,6 +416,9 @@ public class BuildingPlacer : MonoBehaviour
         buildingRenderers = null;
         originalMaterials = null;
         canPlace = false;
+
+        /*Debug.LogWarning("PLACED BUILDING!!");
+        if (buildingPrefab.gameObject.CompareTag("Castle")) Debug.LogWarning("BUILDING PLACED IS CASTLE");*/
     }
 
     void CancelPlacement()

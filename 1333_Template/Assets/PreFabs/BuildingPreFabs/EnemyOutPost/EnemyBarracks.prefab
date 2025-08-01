@@ -55,7 +55,7 @@ MonoBehaviour:
   astarPathfinding: {fileID: 0}
   visualTargetPath: {fileID: 0}
   waitForCastle: 1
-  onlySpawnAfterCastle: 1
+  onlySpawnAfterCastle: 0
   playerCamera: {fileID: 0}
   groundLayerMask:
     serializedVersion: 2
