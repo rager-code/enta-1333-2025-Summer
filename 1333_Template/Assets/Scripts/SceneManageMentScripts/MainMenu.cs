@@ -12,6 +12,7 @@ public class MainMenu : MonoBehaviour
         LoadingSceenManager.instance.SwitchToScene(1);
        
     }
+
     public void QuitGame()
     {
         Debug.Log("Game Closed");
@@ -26,6 +27,7 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene("Main Menu");
     }
+
 
 }
    

@@ -5,18 +5,38 @@ using UnityEngine;
 public class SoundPlayer : MonoBehaviour
 {
     // Start is called before the first frame update
-    AudioSource m_MyAudioSourcee;
+    //AudioSource m_MyAudioSourcee;
 
-    public void Update()
+    public AudioClip[] soundEffects;
+    public enum soundsNames
     {
-        //m_MyAudioSource.Play();
+
+        spawnPlayerUnit,
+        BackGroundSounds,
+        Music,
+
+    }
+    
+    //public soundsNames Test;
+    public void PlaySound(soundsNames name)
+    {
+
+        AudioSource.PlayClipAtPoint(soundEffects[(int)name], transform.position);
+
 
     }
 
-    public void playSound()
+    private void Update()
     {
-       
-
-
+        if (Input.GetKeyUp(KeyCode.F))
+        {
+            PlaySound(soundsNames.spawnPlayerUnit);
+        }
     }
+    public void Awake()
+    {
+        PlaySound(soundsNames.Music);
+        PlaySound(soundsNames.BackGroundSounds);
+    }
+
 }

@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: -4420614429448986125}
   - component: {fileID: 2695171682376178421}
   - component: {fileID: -3849290150710754682}
-  - component: {fileID: 8602903131922466421}
   m_Layer: 0
   m_Name: AidenKramer_Spearmen 1
   m_TagString: Player
@@ -85,19 +84,6 @@ MonoBehaviour:
   healthSlider: {fileID: 6160156100274798466}
   mCamera: {fileID: 0}
   healthBarTransform: {fileID: 0}
---- !u!114 &8602903131922466421
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4675669948239745770}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5125c40f00babe1479e57f12dd7d07cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 10
 --- !u!1001 &2299007954255271112
 PrefabInstance:
   m_ObjectHideFlags: 0

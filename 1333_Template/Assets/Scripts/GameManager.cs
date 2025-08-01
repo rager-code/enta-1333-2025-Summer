@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,13 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CommandTargetPath commandTargetPath;//new
     
     
-    public enum soundsNames
-    {
-       spawnPlayerUnit,
-       BackGroundSounds,
-       Music,
-
-    }
+   
     [Header("Sounds")]
     //public soundsNames Test;
    
@@ -35,10 +28,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.F))
-        {
-            PlaySound(soundsNames.spawnPlayerUnit);
-        }
+       
 
         if (Input.GetKeyUp(KeyCode.N))
         {
@@ -50,6 +40,7 @@ public class GameManager : MonoBehaviour
             SceneManager.LoadScene("Lose");
         }
     }
+    /*
     public void PlaySound(soundsNames name)
     {
        
@@ -64,8 +55,8 @@ public class GameManager : MonoBehaviour
     }
     public void Start()
     {
-        
-        //music here
+        PlaySound(soundsNames.Music);
         PlaySound(soundsNames.BackGroundSounds);
     }
+    */
 }

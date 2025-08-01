@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class NotWalkAble : MonoBehaviour
 {
- 
+
 
     [System.Serializable]
     public class BuildingTypeLimit
@@ -41,7 +41,7 @@ public class NotWalkAble : MonoBehaviour
     private GameObject currentBuilding;
     private Renderer[] buildingRenderers; // Handle multiple renderers
     private Material[] originalMaterials; // Store original materials
-    
+
 
     // Current unwalkable dimensions for the building being placed
     private int currentUnwalkableWidth;
@@ -52,7 +52,6 @@ public class NotWalkAble : MonoBehaviour
 
     private void Start()
     {
-        SetNodesUnwalkable(currentBuilding.transform.position);
         // Find GridManager if not assigned
         if (gridManager == null)
         {
@@ -60,11 +59,42 @@ public class NotWalkAble : MonoBehaviour
             if (gridManager == null)
             {
                 Debug.LogError("GridManager not found! Please assign it in the inspector or ensure one exists in the scene.");
+                return;
             }
         }
+
+        // Set up dimensions
+        if (useCustomUnwalkableArea)
+        {
+            currentUnwalkableWidth = customUnwalkableWidth;
+            currentUnwalkableHeight = customUnwalkableHeight;
+        }
+        else
+        {
+            currentUnwalkableWidth = buildingWidth;
+            currentUnwalkableHeight = buildingHeight;
+        }
+
+        // Snap to grid and set unwalkable
+        StartCoroutine(SetupAfterGrid());
     }
 
-    
+    private IEnumerator SetupAfterGrid()
+    {
+        // Wait for grid to initialize
+        while (gridManager != null && !gridManager.IsInitialized)
+        {
+            yield return null;
+        }
+
+        // Snap this building to grid
+        transform.position = SnapToGrid(transform.position);
+
+        // Set nodes unwalkable
+        SetNodesUnwalkable(transform.position);
+    }
+
+
 
     public void StartPlacingBuilding(GameObject newBuildingPrefab)
     {
@@ -74,7 +104,7 @@ public class NotWalkAble : MonoBehaviour
             return;
         }
 
-       
+
 
         if (currentBuilding != null)
         {
@@ -103,7 +133,7 @@ public class NotWalkAble : MonoBehaviour
         // Store original materials
         StoreOriginalMaterials();
 
-        
+
     }
 
     // Method to set custom unwalkable area at runtime
@@ -122,7 +152,7 @@ public class NotWalkAble : MonoBehaviour
         useCustomUnwalkableArea = enable;
     }
 
-    
+
 
     // Get building dimensions for a specific prefab
     private void GetBuildingDimensions(GameObject prefab, out int width, out int height)
@@ -167,7 +197,7 @@ public class NotWalkAble : MonoBehaviour
         GetBuildingDimensions(prefab, out width, out height);
     }
 
-    
+
     void StoreOriginalMaterials()
     {
         List<Material> originals = new List<Material>();
@@ -187,11 +217,15 @@ public class NotWalkAble : MonoBehaviour
     {
         if (gridManager == null || !gridManager.IsInitialized) return;
 
+        // Calculate half extents for proper centering
+        float halfWidth = (currentUnwalkableWidth - 1) / 2f;
+        float halfHeight = (currentUnwalkableHeight - 1) / 2f;
+
         // Calculate starting position by offsetting from center to create area around building center
         Vector3 startPos = buildingPosition - new Vector3(
-            (currentUnwalkableWidth / 2) * gridManager.GridSettings.NodeSize,
+            halfWidth * gridManager.GridSettings.NodeSize,
             0,
-            (currentUnwalkableHeight / 2) * gridManager.GridSettings.NodeSize
+            halfHeight * gridManager.GridSettings.NodeSize
         );
 
         // Set each node in the unwalkable area to not walkable
@@ -210,11 +244,14 @@ public class NotWalkAble : MonoBehaviour
                 if (node != null)
                 {
                     node.walkable = false;
-                    Debug.Log($"Set node at {nodeWorldPos} to not walkable (unwalkable area: {currentUnwalkableWidth}x{currentUnwalkableHeight})");
+                    Debug.Log($"Set node at {node.WorldPosition} to not walkable (unwalkable area: {currentUnwalkableWidth}x{currentUnwalkableHeight})");
                 }
             }
         }
+
+        Debug.Log($"Created {currentUnwalkableWidth}x{currentUnwalkableHeight} unwalkable area centered at {buildingPosition}");
     }
+
     Vector3 SnapToGrid(Vector3 position)
     {
         if (gridManager == null)
@@ -243,4 +280,3 @@ public class NotWalkAble : MonoBehaviour
         buildingHeight = height;
     }
 }
-

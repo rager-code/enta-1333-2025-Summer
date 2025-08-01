@@ -134,7 +134,7 @@ public class EnemyBarracksSpawner : MonoBehaviour
         // Manual keyboard controls for testing
         if (Input.GetKeyDown(KeyCode.K))
         {
-            MoveAllEnemyUnitsToTarget(); // Moves ALL enemy units to this barracks target
+            MoveAllEnemyUnitsToTarget(currentCastle.transform); // Moves ALL enemy units to this barracks target
         }
 
         if (Input.GetKeyDown(KeyCode.F))
@@ -199,13 +199,13 @@ public class EnemyBarracksSpawner : MonoBehaviour
         }
     }
 
-    public void MoveAllEnemyUnitsToTarget()
+    public void MoveAllEnemyUnitsToTarget(Transform target)
     {
         // Clean up destroyed units from both lists
         allEnemyUnits.RemoveAll(unit => unit == null);
         myEnemyUnits.RemoveAll(unit => unit == null);
 
-        GridNode targetNode = gridManager.GetNodeFromWorldPosition(enemyTargetPoint.position);
+        GridNode targetNode = gridManager.GetNodeFromWorldPosition(target.position);
         if (targetNode != null)
         {
             // Move ALL enemy units from ALL enemy barracks to this target position

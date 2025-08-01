@@ -20,5 +20,5 @@ public class BuildingData
 {
     public GameObject buildingPrefab;
     public string BuildingName;
-    public string BuildingIcon;
+    public Sprite BuildingIcon;
 }
