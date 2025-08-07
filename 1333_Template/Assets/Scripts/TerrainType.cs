@@ -16,13 +16,27 @@ public class TerrainType : ScriptableObject
     [SerializeField] private Vector3 prefabOffset = Vector3.zero; // Offset for prefab positioning
     [SerializeField] private Vector3 prefabScale = Vector3.one;   // Scale for the prefab
 
-    // Public properties
+    // Gets the name of this terrain type
     public string TerrainName => terrainName;
+
+    // Gets the color to draw this terrain in the editor
     public Color GizmoColour => gizmoColour;
+
+    // Returns true if units can walk on this terrain
     public bool Walkable => walkable;
+
+    // How much it costs to move through this terrain
     public int MovementCost => movementCost;
+
+    // The 3D object to place for this terrain type
     public GameObject TerrainPrefab => terrainPrefab;
+
+    // Whether to show colored squares in the editor
     public bool ShowGizmos => showGizmos;
+
+    // How much to offset the 3D object from the grid position
     public Vector3 PrefabOffset => prefabOffset;
+
+    // How big to make the 3D object
     public Vector3 PrefabScale => prefabScale;
 }

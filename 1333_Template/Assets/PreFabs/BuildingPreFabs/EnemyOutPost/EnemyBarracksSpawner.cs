@@ -35,6 +35,7 @@ public class EnemyBarracksSpawner : MonoBehaviour
 
     [Header("Health Reference")]
     public SimpleHealth targetHealth; // Reference to the castle's health script
+    private BuildingHealthAndDamage buildingHealthAndDamage;
 
     [Header("Combat Settings")]
     public float proximityCheckInterval = 0.5f; // How often to check unit proximity to targets
@@ -54,6 +55,8 @@ public class EnemyBarracksSpawner : MonoBehaviour
     private float lastRetargetTime;
     private float lastProximityCheckTime;
 
+   public bool castleEnemyDamage = false;
+
     private void Start()
     {
         if (gridManager == null)
@@ -72,7 +75,10 @@ public class EnemyBarracksSpawner : MonoBehaviour
         {
             playerCamera = Camera.main;
         }
-
+        if (buildingHealthAndDamage == null)
+        {
+            buildingHealthAndDamage = FindAnyObjectByType<BuildingHealthAndDamage>();
+        }
         lastSpawnTime = Time.time;
         lastRetargetTime = Time.time;
         lastProximityCheckTime = Time.time;
@@ -125,6 +131,7 @@ public class EnemyBarracksSpawner : MonoBehaviour
         {
             ClearMyEnemyUnits();
         }
+        
     }
 
     /// <summary>
@@ -243,6 +250,7 @@ public class EnemyBarracksSpawner : MonoBehaviour
                         // Check if unit is within destruction distance
                         if (distance <= destructionDistance)
                         {
+                            
                             Debug.Log($"Enemy unit {unit.name} reached target {targetPrefab.name} - destroying!");
                             unitsToDestroy.Add(unit);
                             break; // No need to check other targets for this unit
@@ -255,6 +263,7 @@ public class EnemyBarracksSpawner : MonoBehaviour
         // Destroy units that reached their targets
         foreach (UnitInstance unit in unitsToDestroy)
         {
+            castleEnemyDamage = true;
             DestroyEnemyUnit(unit);
         }
     }
@@ -298,7 +307,6 @@ public class EnemyBarracksSpawner : MonoBehaviour
 
             // Destroy the game object
             Destroy(unit.gameObject);
-
             Debug.Log($"Destroyed enemy unit {unit.name} that reached its target");
         }
     }

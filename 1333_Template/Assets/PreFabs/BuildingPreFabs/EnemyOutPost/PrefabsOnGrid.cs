@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Stores settings for each prefab that can be spawned
 [System.Serializable]
 public class PrefabSpawnInfo
 {
@@ -27,17 +28,19 @@ public class PrefabsOnGrid : MonoBehaviour
     private List<GameObject> spawnedPrefabs = new List<GameObject>();
     private Dictionary<GameObject, List<GridNode>> prefabToNodesMap = new Dictionary<GameObject, List<GridNode>>();
 
+    // Start is called on scene load
     private void Start()
     {
+        // Wait for grid setup before spawning if needed
         if (spawnOnStart != null)
         {
             StartCoroutine(SpawnPrefabsWhenGridReady());
         }
     }
 
+    // Waits until the grid is initialized before spawning
     private IEnumerator SpawnPrefabsWhenGridReady()
     {
-        // Wait until the grid is initialized
         while (!gridManager.IsInitialized)
         {
             yield return null;
@@ -46,6 +49,7 @@ public class PrefabsOnGrid : MonoBehaviour
         SpawnPrefabsRandomly();
     }
 
+    // Spawns multiple prefabs onto available walkable nodes
     public void SpawnPrefabsRandomly()
     {
         if (gridManager == null || !gridManager.IsInitialized)
@@ -60,7 +64,7 @@ public class PrefabsOnGrid : MonoBehaviour
             return;
         }
 
-        // Get all walkable nodes
+        // Get available grid nodes
         List<GridNode> availableNodes = GetWalkableNodes();
 
         if (availableNodes.Count == 0)
@@ -77,30 +81,30 @@ public class PrefabsOnGrid : MonoBehaviour
         {
             attempts++;
 
-            // Select a random prefab based on weight
+            // Pick a prefab based on weight
             PrefabSpawnInfo selectedPrefabInfo = GetWeightedRandomPrefab();
             if (selectedPrefabInfo == null || selectedPrefabInfo.prefab == null) continue;
 
-            // Try to find a valid spawn position
+            // Find a spawnable position for this prefab
             GridNode spawnNode = FindValidSpawnPosition(availableNodes, selectedPrefabInfo);
             if (spawnNode == null) continue;
 
-            // Get all nodes that will be occupied by this prefab
+            // Get grid nodes the prefab will occupy
             List<GridNode> occupiedNodes = GetOccupiedNodes(spawnNode, selectedPrefabInfo);
             if (occupiedNodes.Count == 0) continue;
 
-            // Spawn the prefab
+            // Spawn the prefab into the scene
             GameObject spawnedPrefab = Instantiate(selectedPrefabInfo.prefab, spawnNode.WorldPosition, Quaternion.identity);
             spawnedPrefab.transform.SetParent(transform);
 
-            // Mark all occupied nodes as non-walkable
+            // Mark those grid nodes as taken
             foreach (GridNode node in occupiedNodes)
             {
                 node.walkable = false;
-                availableNodes.Remove(node); // Remove from available nodes
+                availableNodes.Remove(node);
             }
 
-            // Track the spawned prefab and its occupied nodes
+            // Track spawned prefab and its nodes
             spawnedPrefabs.Add(spawnedPrefab);
             prefabToNodesMap[spawnedPrefab] = occupiedNodes;
 
@@ -112,6 +116,7 @@ public class PrefabsOnGrid : MonoBehaviour
         Debug.Log($"Successfully spawned {successfulSpawns} prefabs on the grid! ({attempts} attempts made)");
     }
 
+    // Gets all nodes on the grid that are walkable
     private List<GridNode> GetWalkableNodes()
     {
         List<GridNode> walkableNodes = new List<GridNode>();
@@ -128,20 +133,21 @@ public class PrefabsOnGrid : MonoBehaviour
         return walkableNodes;
     }
 
+    // Removes all spawned prefabs and resets the grid state
     public void ClearAllSpawnedPrefabs()
     {
         foreach (GameObject prefab in spawnedPrefabs)
         {
             if (prefab != null)
             {
-                // Restore walkability for all nodes occupied by this prefab
+                // Restore the walkable state of each node this prefab used
                 if (prefabToNodesMap.ContainsKey(prefab))
                 {
                     foreach (GridNode node in prefabToNodesMap[prefab])
                     {
                         if (node != null)
                         {
-                            node.walkable = node.terrainType.Walkable; // Reset to terrain's original walkable state
+                            node.walkable = node.terrainType.Walkable;
                         }
                     }
                 }
@@ -155,7 +161,7 @@ public class PrefabsOnGrid : MonoBehaviour
         Debug.Log("Cleared all spawned prefabs and restored node walkability!");
     }
 
-    // Editor utility method to manually trigger spawning
+    // Lets you trigger prefab spawning via the Unity context menu
     [ContextMenu("Spawn Prefabs")]
     public void ManualSpawn()
     {
@@ -169,13 +175,14 @@ public class PrefabsOnGrid : MonoBehaviour
         }
     }
 
-    // Editor utility method to clear spawned prefabs
+    // Lets you manually clear spawned prefabs from the Unity context menu
     [ContextMenu("Clear Spawned Prefabs")]
     public void ManualClear()
     {
         ClearAllSpawnedPrefabs();
     }
 
+    // Randomly selects a prefab from the list using weighted odds
     private PrefabSpawnInfo GetWeightedRandomPrefab()
     {
         float totalWeight = 0f;
@@ -199,9 +206,10 @@ public class PrefabsOnGrid : MonoBehaviour
                 return prefabInfo;
         }
 
-        return prefabsToSpawn[prefabsToSpawn.Length - 1]; // Fallback
+        return prefabsToSpawn[prefabsToSpawn.Length - 1]; // Fallback option
     }
 
+    // Finds a valid node to place the prefab on
     private GridNode FindValidSpawnPosition(List<GridNode> availableNodes, PrefabSpawnInfo prefabInfo)
     {
         List<GridNode> validNodes = new List<GridNode>();
@@ -219,11 +227,11 @@ public class PrefabsOnGrid : MonoBehaviour
         return validNodes[Random.Range(0, validNodes.Count)];
     }
 
+    // Checks if the prefab can fit at a given node
     private bool CanPlacePrefabAt(GridNode startNode, PrefabSpawnInfo prefabInfo)
     {
         List<GridNode> requiredNodes = GetRequiredNodes(startNode, prefabInfo);
 
-        // Check if all required nodes exist and are walkable
         foreach (GridNode node in requiredNodes)
         {
             if (node == null || !node.walkable)
@@ -233,31 +241,27 @@ public class PrefabsOnGrid : MonoBehaviour
         return requiredNodes.Count == prefabInfo.width * prefabInfo.height;
     }
 
+    // Gets the grid nodes a prefab would take up based on its size
     private List<GridNode> GetRequiredNodes(GridNode startNode, PrefabSpawnInfo prefabInfo)
     {
         List<GridNode> nodes = new List<GridNode>();
 
-        // Convert world position to grid coordinates
         Vector3 startPos = startNode.WorldPosition;
         GridNode startGridNode = gridManager.GetNodeFromWorldPosition(startPos);
 
         if (startGridNode == null) return nodes;
 
-        // Calculate the starting grid position (this is now the CENTER of the prefab)
         Vector2Int centerGridPos = GetGridPosition(startGridNode);
-        if (centerGridPos.x == -1) return nodes; // Invalid position
+        if (centerGridPos.x == -1) return nodes;
 
-        // Calculate offset to center the prefab
         int halfWidth = prefabInfo.width / 2;
         int halfHeight = prefabInfo.height / 2;
 
-        // Calculate the actual starting position (bottom-left corner of the prefab area)
         Vector2Int startGridPos = new Vector2Int(
             centerGridPos.x - halfWidth,
             centerGridPos.y - halfHeight
         );
 
-        // Get all nodes in the width x height area
         for (int x = 0; x < prefabInfo.width; x++)
         {
             for (int y = 0; y < prefabInfo.height; y++)
@@ -275,14 +279,15 @@ public class PrefabsOnGrid : MonoBehaviour
         return nodes;
     }
 
+    // Helper to get occupied nodes — same as required nodes
     private List<GridNode> GetOccupiedNodes(GridNode startNode, PrefabSpawnInfo prefabInfo)
     {
         return GetRequiredNodes(startNode, prefabInfo);
     }
 
+    // Finds the X,Y grid coordinate for a given GridNode
     private Vector2Int GetGridPosition(GridNode node)
     {
-        // Find the grid position by searching through all nodes
         List<GridNode> allNodes = gridManager.GetAllNodes();
 
         for (int x = 0; x < gridManager.GridSettings.GridSizeX; x++)

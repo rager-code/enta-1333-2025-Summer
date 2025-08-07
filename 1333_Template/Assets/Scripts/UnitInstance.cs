@@ -26,6 +26,7 @@ public class UnitInstance : UnitBase
     public bool IsMoving => isMoving;
     public List<GridNode> CurrentPath => currentPath;
 
+    // Sets up all the stuff this unit needs to work properly
     public void Initialize(AStarPathfinding pathfinder, UnitType unitType, GridManager grid, VisualTargetPath pathFinderVis)
     {
         // assign dependencies at runtime from army manager
@@ -36,6 +37,7 @@ public class UnitInstance : UnitBase
         //vPath = FindFirstObjectByType<VisualTargetPath>();
     }
 
+    // Tells this unit to walk to a specific spot on the grid
     public override void MoveTo(GridNode targetNode)
     {
         if (targetNode == null) return;
@@ -85,6 +87,7 @@ public class UnitInstance : UnitBase
         }
     }
 
+    // Gets the unit ready to start walking along a path
     public void StartPathMovement(List<GridNode> path)
     {
         // reset movement state
@@ -95,6 +98,7 @@ public class UnitInstance : UnitBase
         Debug.Log($"{name} is beginning movement along path.");
     }
 
+    // Makes the unit stop moving and clears everything
     public void StopMoving()
     {
         // stop all movement and clear path
@@ -119,6 +123,7 @@ public class UnitInstance : UnitBase
         Debug.Log($"{name} movement stopped.");
     }
 
+    // Does the actual moving from point to point along the path
     public override void DoMove()
     {
         // check if we're still allowed to move
@@ -148,6 +153,7 @@ public class UnitInstance : UnitBase
         }
     }
 
+    // Checks if enemy units are nearby and destroys this unit if they are
     private void CheckProximityDestroy()
     {
         var allUnits = FindObjectsOfType<UnitInstance>();
@@ -167,10 +173,14 @@ public class UnitInstance : UnitBase
             }
         }
     }
+
+    // Unity's update loop - runs every frame
     public void Update()
     {
         CheckProximityDestroy();
     }
+
+    // Gets called by the RTS manager to handle unit behavior each tick
     public override void PerTick()
     {
         // called by the RTS update manager
@@ -180,6 +190,7 @@ public class UnitInstance : UnitBase
         //CheckProximityDestroy();
     }
 
+    // Makes this unit glow or look selected
     public void Select()
     {
         // highlight on selection (optional)
@@ -187,6 +198,7 @@ public class UnitInstance : UnitBase
         Debug.Log($"{name} selected.");
     }
 
+    // Removes the selection visual from this unit
     public void Deselect()
     {
         // remove selection highlight (optional)
@@ -195,8 +207,9 @@ public class UnitInstance : UnitBase
     }
 }
 
+// Which team a unit belongs to
 public enum Army
 {
-    Army1,
-    Army2
+    Army1, // First team
+    Army2  // Second team
 }

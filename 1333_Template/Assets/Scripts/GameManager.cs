@@ -10,25 +10,28 @@ public class GameManager : MonoBehaviour
     [SerializeField] private UnitManager unitManager;   // Manages units on the grid
     [SerializeField] private VisualTargetPath pathFinder;   // Handles visual pathfinding
     [SerializeField] private CommandTargetPath commandTargetPath;//new
-    
-    
-   
+
+
+
     [Header("Sounds")]
     //public soundsNames Test;
-   
+
     public AudioClip[] soundEffects;
+
+    // Gets everything ready when the game starts up
     private void Awake()
     {
         // Initialize grid and reset the pathfinder when the game starts
         gridManager.InitializeGrid();
         pathFinder.ResetField();
-       
+
         //commandTargetPath.ResetField();//new
     }
 
+    // Checks for input every frame
     private void Update()
     {
-       
+
 
         if (Input.GetKeyUp(KeyCode.N))
         {
@@ -40,23 +43,5 @@ public class GameManager : MonoBehaviour
             SceneManager.LoadScene("Lose");
         }
     }
-    /*
-    public void PlaySound(soundsNames name)
-    {
-       
-            AudioSource.PlayClipAtPoint(soundEffects[(int)name], transform.position);
-        
-        
-    }
-    public void SoundBegin()
-    {
-       
-
-    }
-    public void Start()
-    {
-        PlaySound(soundsNames.Music);
-        PlaySound(soundsNames.BackGroundSounds);
-    }
-    */
+    
 }

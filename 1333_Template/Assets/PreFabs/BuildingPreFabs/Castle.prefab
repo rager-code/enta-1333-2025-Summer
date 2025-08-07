@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 2178724404019195430}
   - component: {fileID: 6356138334061060840}
   - component: {fileID: 7446628851971724200}
-  - component: {fileID: 112559232061125129}
   - component: {fileID: -2400305628290054545}
   - component: {fileID: -3136803873648859043}
   m_Layer: 0
@@ -124,27 +123,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackEnemyDestruction: 1
   checkInterval: 0.5
---- !u!114 &112559232061125129
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5287982606913193149}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1119db6791e576d48ba99ff30bc39c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  multipliers: {fileID: 11400000, guid: cb8aedf658af4c041b567d13e96b74f4, type: 2}
-  currentResourceRate: 10
-  currentDamage: 50
-  currentHealth: 100
-  currentArmor: 5
-  baseResourceRate: 10
-  baseDamage: 50
-  baseHealth: 100
-  baseArmor: 5
 --- !u!114 &-2400305628290054545
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,7 +135,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dc9e7b7dc3ae7f4a8f0980206174ba4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameOver: GameOver
 --- !u!114 &-3136803873648859043
 MonoBehaviour:
   m_ObjectHideFlags: 0

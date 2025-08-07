@@ -8,12 +8,14 @@ public class VisualPath : MonoBehaviour
 
     private LineRenderer lineRenderer;
 
+    // Gets called when the object first wakes up
     private void Awake()
     {
         // set up the line renderer used to draw path lines
         SetupLineRenderer();
     }
 
+    // Wipes the visual stuff clean so we can start fresh
     public void ResetFeild()
     {
         // clear any line and gizmos previously drawn
@@ -21,6 +23,7 @@ public class VisualPath : MonoBehaviour
         //pathfindingLogic?.ClearVisualization();
     }
 
+    // Takes a bunch of nodes and draws a line through them
     public void DrawPath(List<GridNode> path)
     {
         // validate the path before drawing
@@ -35,6 +38,7 @@ public class VisualPath : MonoBehaviour
         }
     }
 
+    // Does the boring setup work for the line renderer
     private void SetupLineRenderer()
     {
         // configure line renderer with basic settings

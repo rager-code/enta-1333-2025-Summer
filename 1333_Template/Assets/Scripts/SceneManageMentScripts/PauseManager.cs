@@ -26,7 +26,7 @@ public class PauseManager : MonoBehaviour
                 
         }
     }
-
+    //Resumes the game
     public void Resume()
     {
         PauseMenuUI.SetActive(false);
@@ -36,6 +36,7 @@ public class PauseManager : MonoBehaviour
       
 
     }
+    //Pauses the game
     public void Pause()
     {
         PauseMenuUI.SetActive(true);
@@ -44,6 +45,7 @@ public class PauseManager : MonoBehaviour
         Debug.Log("Game Paused");
         
     }
+    //Sets the Pas
     public void Start()
     {
         PauseMenuUI.SetActive(false);

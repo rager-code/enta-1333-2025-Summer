@@ -6,12 +6,14 @@ public class PlayerUnitMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 2f;
 
+    // Stops whatever we're doing and starts moving along a new path
     public void StartMoving(List<GridNode> path)
     {
         StopAllCoroutines();
         StartCoroutine(MoveAlongPath(path));
     }
 
+    // Does the actual work of moving from node to node
     private IEnumerator MoveAlongPath(List<GridNode> path)
     {
         foreach (GridNode node in path)

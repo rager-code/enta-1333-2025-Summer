@@ -5,7 +5,7 @@ using static GameManager;
 
 public class BarracksSpawner : MonoBehaviour
 {
-    // Start is called before the first frame update
+    // Basic setup for spawning units
     public GameObject unitPrefab;
     public Transform spawnPoint;
     public Transform endPoint;
@@ -14,18 +14,17 @@ public class BarracksSpawner : MonoBehaviour
     public AStarPathfinding astarPathfinding;
     public VisualTargetPath visualTargetPath;
 
-    
-
     [Header("Click Controls")]
     public Camera playerCamera; // Assign your main camera
     public LayerMask groundLayerMask = 1; // Layer mask for ground/walkable areas
     public bool enableClickToMove = true;
 
-    // Static list to track ALL units from ALL barracks
+    // Keep track of all units from all barracks in the game
     private static List<UnitInstance> allUnits = new List<UnitInstance>();
-    // List to track units spawned by THIS specific barracks
+    // Keep track of units spawned by just this specific barracks
     private List<UnitInstance> myUnits = new List<UnitInstance>();
 
+    // Find all the required components when we start
     private void Start()
     {
         if (gridManager == null)
@@ -46,6 +45,7 @@ public class BarracksSpawner : MonoBehaviour
         }
     }
 
+    // Handle input every frame
     private void Update()
     {
         // Handle mouse click for moving target
@@ -54,42 +54,38 @@ public class BarracksSpawner : MonoBehaviour
             HandleMouseClick();
         }
 
-        // Keyboard controls
+        // G key - Move ALL units from ALL barracks to this barracks' target
         if (Input.GetKeyDown(KeyCode.G))
         {
             UnitPositionTracker(); // Moves ALL units to this barracks
-           
-              
-            
         }
 
+        // F key - Spawn a new unit from this barracks
         if (Input.GetKeyDown(KeyCode.F))
         {
             UnitSpawn();
-
         }
 
-        // Move only units from THIS barracks
+        // H key - Move only units from THIS barracks
         if (Input.GetKeyDown(KeyCode.H))
         {
             MoveMyUnitsOnly();
         }
 
-        // Optional: Clear all units from ALL barracks with C key
+        // C key - Delete all units from all barracks
         if (Input.GetKeyDown(KeyCode.C))
         {
             ClearAllUnits();
         }
 
-        // Optional: Clear only units from THIS barracks with V key
+        // V key - Delete only units from this barracks
         if (Input.GetKeyDown(KeyCode.V))
         {
             ClearMyUnits();
         }
-        
     }
-   
 
+    // Handle clicking on the ground to set new target location
     private void HandleMouseClick()
     {
         Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
@@ -109,6 +105,7 @@ public class BarracksSpawner : MonoBehaviour
         }
     }
 
+    // Move all units from this barracks to a new target position
     private void MoveMyUnitsToNewTarget(Vector3 newTargetPosition)
     {
         myUnits.RemoveAll(unit => unit == null);
@@ -136,6 +133,7 @@ public class BarracksSpawner : MonoBehaviour
         }
     }
 
+    // Move ALL units from ALL barracks to this barracks' target point
     public void UnitPositionTracker()
     {
         // Clean up destroyed units from both lists
@@ -170,9 +168,9 @@ public class BarracksSpawner : MonoBehaviour
         }
     }
 
+    // Spawn a new unit and send it to the target location
     public void UnitSpawn()
     {
-      
         GameObject newUnit = Instantiate(unitPrefab, spawnPoint.position, Quaternion.identity);
         UnitInstance unit = newUnit.GetComponent<UnitInstance>();
         unit.Initialize(astarPathfinding, unitType, gridManager, visualTargetPath);
@@ -180,8 +178,6 @@ public class BarracksSpawner : MonoBehaviour
         // Add the new unit to both tracking lists
         allUnits.Add(unit);
         myUnits.Add(unit);
-
-       
 
         GridNode targetNode = gridManager.GetNodeFromWorldPosition(endPoint.position);
         if (targetNode != null)
@@ -195,7 +191,7 @@ public class BarracksSpawner : MonoBehaviour
         }
     }
 
-    // Method to move only units spawned by THIS barracks
+    // Move only the units that were spawned by this specific barracks
     public void MoveMyUnitsOnly()
     {
         myUnits.RemoveAll(unit => unit == null);
@@ -216,21 +212,21 @@ public class BarracksSpawner : MonoBehaviour
         }
     }
 
-    // Public method to set target position programmatically
+    // Set a new target position from code
     public void SetTargetPosition(Vector3 newPosition)
     {
         endPoint.position = newPosition;
         MoveMyUnitsToNewTarget(newPosition);
     }
 
-    // Method to toggle click-to-move functionality
+    // Enable or disable clicking to move units
     public void SetClickToMoveEnabled(bool enabled)
     {
         enableClickToMove = enabled;
         Debug.Log($"Click to move: {(enabled ? "Enabled" : "Disabled")}");
     }
 
-   
+    // Delete all units from every barracks in the game
     public static void ClearAllUnits()
     {
         foreach (UnitInstance unit in allUnits)
@@ -244,7 +240,7 @@ public class BarracksSpawner : MonoBehaviour
         Debug.Log("Cleared all units from all barracks");
     }
 
-    // Clear units spawned by THIS barracks only
+    // Delete only the units that came from this specific barracks
     public void ClearMyUnits()
     {
         foreach (UnitInstance unit in myUnits)
@@ -260,7 +256,7 @@ public class BarracksSpawner : MonoBehaviour
         Debug.Log("Cleared units from this barracks");
     }
 
-    // Visual debug helper
+    // Draw visual indicators in the scene view for debugging
     private void OnDrawGizmos()
     {
         if (endPoint != null)

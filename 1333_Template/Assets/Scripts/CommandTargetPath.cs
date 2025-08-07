@@ -9,7 +9,7 @@ public class CommandTargetPath : MonoBehaviour
     [SerializeField] private AStarPathfinding pathfindingLogic;
     [SerializeField] private GameObject startPosPrefab;
     [SerializeField] private GameObject endPosPrefab;
-    
+
 
     [Header("Tuning")]
     [SerializeField] private float searchDelay = 0.1f;
@@ -23,18 +23,21 @@ public class CommandTargetPath : MonoBehaviour
     private Camera mainCamera;
     private Coroutine pathRoutine;
 
+    // Sets up the line renderer and grabs the main camera
     private void Awake()
     {
         SetupLineRenderer();
         mainCamera = Camera.main;
     }
 
+    // Checks for mouse clicks every frame
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
             TrySetNewTargetFromClick();
     }
 
+    // Figures out what grid square the player clicked on
     public void TrySetNewTargetFromClick()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -48,13 +51,14 @@ public class CommandTargetPath : MonoBehaviour
                     StopCoroutine(pathRoutine);
 
                 //if (movingAgent.TryGetComponent(out Player_Targeting mover))//ToDo make moving agent a parameter 
-                    //mover.StopMoving();
+                //mover.StopMoving();
 
                 //pathRoutine = StartCoroutine(GeneratePathTo(clickedNode));
             }
         }
     }
 
+    // Creates a path from a unit to the target and makes the unit start moving
     public IEnumerator GeneratePathTo(GridNode targetNode, UnitInstance movingAgent)
     {
         if (endInstance != null) Destroy(endInstance);
@@ -89,6 +93,7 @@ public class CommandTargetPath : MonoBehaviour
         pathRoutine = null;
     }
 
+    // Draws the path as a colored line in the world
     private void DrawPath(List<GridNode> path)
     {
         if (lineRenderer == null) return;
@@ -98,6 +103,7 @@ public class CommandTargetPath : MonoBehaviour
             lineRenderer.SetPosition(i, path[i].WorldPosition + Vector3.up * 0.2f);
     }
 
+    // Sets up the line renderer with colors and settings
     private void SetupLineRenderer()
     {
         lineRenderer ??= gameObject.AddComponent<LineRenderer>();
@@ -110,6 +116,7 @@ public class CommandTargetPath : MonoBehaviour
         lineRenderer.positionCount = 0;
     }
 
+    // Clears everything - paths, markers, and stops any movement
     public void ResetField()
     {
         if (pathRoutine != null) StopCoroutine(pathRoutine);
@@ -120,7 +127,6 @@ public class CommandTargetPath : MonoBehaviour
 
         if (lineRenderer != null) lineRenderer.positionCount = 0;
 
-        //if (movingAgent.TryGetComponent(out Player_Targeting mover))
-            //mover.StopMoving();
+        
     }
 }

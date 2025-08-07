@@ -6,13 +6,14 @@ public class AStarPathfinding : MonoBehaviour
 {
     [SerializeField] private GridManager gridManager;
 
-    // New: Callback system for path completion
+    // Settings for checking when units reach their destination
     [Header("Path Completion Settings")]
     [SerializeField] private float destinationThreshold = 0.5f;
 
-    // Dictionary to track active paths and their completion callbacks
+    // Keep track of units that are moving and when they finish
     private Dictionary<GameObject, PathTracker> activePathTrackers = new Dictionary<GameObject, PathTracker>();
 
+    // Find the grid manager when we start up
     private void Start()
     {
         // Find GridManager if not assigned
@@ -22,18 +23,19 @@ public class AStarPathfinding : MonoBehaviour
         }
     }
 
+    // Check every frame if any units have reached their destination
     private void Update()
     {
         // Check all active path trackers for completion
         CheckPathCompletions();
     }
 
-    // Enhanced FindPath with optional callback
+    // Main pathfinding function with callback support for when the unit arrives
     public List<GridNode> FindPath(GridManager gridManager, GridNode start, GridNode end, int unitWidth = 1, int unitHeight = 1, GameObject unit = null, Action<GameObject> onPathComplete = null)
     {
         List<GridNode> path = FindPathInternal(gridManager, start, end, unitWidth, unitHeight);
 
-        // If callback is provided and path is valid, start tracking
+        // If we want to know when the unit finishes moving, start tracking it
         if (onPathComplete != null && unit != null && path.Count > 0)
         {
             StartTrackingPath(unit, path, end, onPathComplete);
@@ -42,23 +44,25 @@ public class AStarPathfinding : MonoBehaviour
         return path;
     }
 
+    // Simpler version that uses the default grid manager
     public List<GridNode> FindPath(GridNode start, GridNode end, int unitWidth = 1, int unitHeight = 1, GameObject unit = null, Action<GameObject> onPathComplete = null)
     {
         return FindPath(gridManager, start, end, unitWidth, unitHeight, unit, onPathComplete);
     }
 
-    // Original FindPath methods (backward compatibility)
+    // Basic pathfinding without callbacks (for backwards compatibility)
     public List<GridNode> FindPath(GridManager gridManager, GridNode start, GridNode end, int unitWidth = 1, int unitHeight = 1)
     {
         return FindPathInternal(gridManager, start, end, unitWidth, unitHeight);
     }
 
+    // Another basic version using default grid manager
     public List<GridNode> FindPath(GridNode start, GridNode end, int unitWidth = 1, int unitHeight = 1)
     {
         return FindPath(gridManager, start, end, unitWidth, unitHeight);
     }
 
-    // Internal pathfinding logic (unchanged from your original)
+    // This is where the actual A* pathfinding magic happens
     private List<GridNode> FindPathInternal(GridManager gridManager, GridNode start, GridNode end, int unitWidth = 1, int unitHeight = 1)
     {
         if (start == null || end == null)
@@ -117,7 +121,7 @@ public class AStarPathfinding : MonoBehaviour
         return new List<GridNode>();
     }
 
-    // NEW: Start tracking a unit's path for completion
+    // Start watching a unit to see when it reaches its destination
     private void StartTrackingPath(GameObject unit, List<GridNode> path, GridNode destination, Action<GameObject> onComplete)
     {
         if (activePathTrackers.ContainsKey(unit))
@@ -134,7 +138,7 @@ public class AStarPathfinding : MonoBehaviour
         Debug.Log($"Started tracking path for {unit.name} to {destination.Name}");
     }
 
-    // NEW: Check all tracked paths for completion
+    // Check if any units have reached their destinations
     private void CheckPathCompletions()
     {
         List<GameObject> completedPaths = new List<GameObject>();
@@ -173,7 +177,7 @@ public class AStarPathfinding : MonoBehaviour
         }
     }
 
-    // NEW: Public method to manually stop tracking a unit
+    // Stop watching a specific unit (useful if you cancel their movement)
     public void StopTrackingUnit(GameObject unit)
     {
         if (activePathTrackers.ContainsKey(unit))
@@ -183,26 +187,25 @@ public class AStarPathfinding : MonoBehaviour
         }
     }
 
-    // NEW: Public method to check if a unit is being tracked
+    // Check if we're currently watching a unit
     public bool IsTrackingUnit(GameObject unit)
     {
         return activePathTrackers.ContainsKey(unit);
     }
 
-    // NEW: Public method to get number of tracked units
+    // Get how many units we're currently tracking
     public int GetTrackedUnitsCount()
     {
         return activePathTrackers.Count;
     }
 
-    // NEW: Public method to set destination threshold
+    // Change how close a unit needs to be to count as "arrived"
     public void SetDestinationThreshold(float threshold)
     {
         destinationThreshold = threshold;
     }
 
-    // All your original methods remain unchanged below:
-
+    // Clean up all the pathfinding data before starting a new search
     private void ResetAllNodes(GridManager gridManager)
     {
         foreach (GridNode node in gridManager.GetAllNodes())
@@ -213,6 +216,7 @@ public class AStarPathfinding : MonoBehaviour
         }
     }
 
+    // Calculate the estimated distance from one node to another (straight line)
     private int CalculateHeuristic(GridNode nodeA, GridNode nodeB)
     {
         Vector2Int posA = WorldToGridPosition(nodeA.WorldPosition);
@@ -225,6 +229,7 @@ public class AStarPathfinding : MonoBehaviour
         return (distanceX + distanceY) * 10; // Multiply by 10 for better precision
     }
 
+    // Figure out how much it costs to move from one node to another
     private int GetMovementCost(GridNode from, GridNode to)
     {
         // Base movement cost is 10 (straight movement)
@@ -236,6 +241,7 @@ public class AStarPathfinding : MonoBehaviour
         return baseCost + terrainCost;
     }
 
+    // Check if a unit can actually walk on this node (considering unit size)
     private bool IsNodeWalkable(GridNode node, int unitWidth, int unitHeight)
     {
         if (node == null || !node.walkable)
@@ -250,6 +256,7 @@ public class AStarPathfinding : MonoBehaviour
         return true;
     }
 
+    // Check if there's enough space for a bigger unit to fit
     private bool CheckAreaWalkable(GridNode centerNode, int width, int height)
     {
         Vector2Int centerPos = WorldToGridPosition(centerNode.WorldPosition);
@@ -275,6 +282,7 @@ public class AStarPathfinding : MonoBehaviour
         return true;
     }
 
+    // Convert world coordinates to grid coordinates
     private Vector2Int WorldToGridPosition(Vector3 worldPos)
     {
         if (gridManager == null)
@@ -292,6 +300,7 @@ public class AStarPathfinding : MonoBehaviour
         return new Vector2Int(x_grid, y_grid);
     }
 
+    // Find the node with the lowest F cost (best option to explore next)
     private GridNode GetLowestFCostNode(List<GridNode> nodes)
     {
         GridNode bestNode = nodes[0];
@@ -308,6 +317,7 @@ public class AStarPathfinding : MonoBehaviour
         return bestNode;
     }
 
+    // Build the final path by working backwards from the destination
     private List<GridNode> ReconstructPath(GridNode endNode)
     {
         List<GridNode> path = new List<GridNode>();
@@ -323,7 +333,7 @@ public class AStarPathfinding : MonoBehaviour
         return path;
     }
 
-    // Debug method to visualize pathfinding costs
+    // Helper for debugging - shows the costs for a specific node
     public void DebugNodeCosts(GridNode node)
     {
         if (node != null)
@@ -332,7 +342,7 @@ public class AStarPathfinding : MonoBehaviour
         }
     }
 
-    // Method to get the total path cost
+    // Get the total movement cost for a complete path
     public int GetPathCost(List<GridNode> path)
     {
         if (path == null || path.Count == 0)
@@ -341,7 +351,7 @@ public class AStarPathfinding : MonoBehaviour
         return path[path.Count - 1].GCost;
     }
 
-    // NEW: Helper class to track path completion
+    // Helper class to keep track of units and their destinations
     [System.Serializable]
     private class PathTracker
     {

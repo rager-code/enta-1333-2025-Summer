@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class BuildingPlacer : MonoBehaviour
 {
+    // Settings for each different building type
     [System.Serializable]
     public class BuildingTypeLimit
     {
@@ -37,6 +38,7 @@ public class BuildingPlacer : MonoBehaviour
     [Header("Grid Reference")]
     [SerializeField] private GridManager gridManager; // Reference to the grid manager
 
+    // Variables to track the building we're currently placing
     private GameObject currentBuilding;
     private Renderer[] buildingRenderers; // Handle multiple renderers
     private Material[] originalMaterials; // Store original materials
@@ -47,9 +49,10 @@ public class BuildingPlacer : MonoBehaviour
     private int currentUnwalkableWidth;
     private int currentUnwalkableHeight;
 
-    // Dictionary to track placed buildings by prefab type
+    // Keep track of how many of each building type we've placed
     private static Dictionary<GameObject, int> placedBuildingsByType = new Dictionary<GameObject, int>();
 
+    // Find the grid manager when we start up
     private void Start()
     {
         // Find GridManager if not assigned
@@ -63,6 +66,7 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
+    // Handle building placement controls every frame
     void Update()
     {
         if (currentBuilding != null)
@@ -70,24 +74,28 @@ public class BuildingPlacer : MonoBehaviour
             MoveBuildingWithMouse();
             CheckPlacementValidity();
 
+            // Left click to place building
             if (Input.GetMouseButtonDown(0) && canPlace)
             {
                 PlaceBuilding();
             }
 
+            // Right click or escape to cancel
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
             {
                 CancelPlacement();
             }
 
+            // R key to rotate building
             if (Input.GetKeyDown(KeyCode.R))
             {
                 RotateBuilding();
             }
-          
+
         }
     }
 
+    // Start placing a specific building type
     public void StartPlacingBuilding(GameObject newBuildingPrefab)
     {
         if (newBuildingPrefab == null)
@@ -96,7 +104,7 @@ public class BuildingPlacer : MonoBehaviour
             return;
         }
 
-        // Check if max buildings limit reached for this specific building type
+        // Check if we've already placed the maximum number of this building type
         int currentCount = GetPlacedBuildingCount(newBuildingPrefab);
         int maxAllowed = GetMaxBuildingCount(newBuildingPrefab);
         if (currentCount >= maxAllowed)
@@ -105,6 +113,7 @@ public class BuildingPlacer : MonoBehaviour
             return;
         }
 
+        // Clean up any existing building preview
         if (currentBuilding != null)
         {
             Destroy(currentBuilding);
@@ -118,6 +127,7 @@ public class BuildingPlacer : MonoBehaviour
         // Get unwalkable dimensions (can be different from visual building size)
         GetUnwalkableDimensions(newBuildingPrefab, out currentUnwalkableWidth, out currentUnwalkableHeight);
 
+        // Create a preview of the building
         currentBuilding = Instantiate(buildingPrefab);
 
         // Get all renderers in the building (including children)
@@ -132,10 +142,11 @@ public class BuildingPlacer : MonoBehaviour
         // Store original materials
         StoreOriginalMaterials();
 
+        // Start with red color to show it can't be placed yet
         SetBuildingColor(Color.red);
     }
 
-    // Method to set custom unwalkable area at runtime
+    // Set a custom area that units can't walk through (useful for special buildings)
     public void SetCustomUnwalkableArea(int width, int height)
     {
         customUnwalkableWidth = width;
@@ -145,13 +156,13 @@ public class BuildingPlacer : MonoBehaviour
         Debug.Log($"Custom unwalkable area set to {width}x{height}");
     }
 
-    // Method to toggle custom unwalkable area
+    // Toggle whether to use custom unwalkable area or default
     public void EnableCustomUnwalkableArea(bool enable)
     {
         useCustomUnwalkableArea = enable;
     }
 
-    // Get the maximum allowed count for a specific prefab type
+    // Get the maximum allowed count for a specific building type
     private int GetMaxBuildingCount(GameObject prefab)
     {
         foreach (BuildingTypeLimit limit in buildingTypeLimits)
@@ -164,7 +175,7 @@ public class BuildingPlacer : MonoBehaviour
         return 1; // Default limit if not found in the list
     }
 
-    // Get building dimensions for a specific prefab
+    // Get the size of a specific building type
     private void GetBuildingDimensions(GameObject prefab, out int width, out int height)
     {
         foreach (BuildingTypeLimit limit in buildingTypeLimits)
@@ -181,7 +192,7 @@ public class BuildingPlacer : MonoBehaviour
         height = buildingHeight;
     }
 
-    // Get unwalkable dimensions for a specific prefab (can be different from visual size)
+    // Get the unwalkable area size (might be different from visual building size)
     private void GetUnwalkableDimensions(GameObject prefab, out int width, out int height)
     {
         // If using custom unwalkable area, use those values
@@ -207,7 +218,7 @@ public class BuildingPlacer : MonoBehaviour
         GetBuildingDimensions(prefab, out width, out height);
     }
 
-    // Get the count of placed buildings for a specific prefab type
+    // Check how many of this building type we've already placed
     private int GetPlacedBuildingCount(GameObject prefab)
     {
         if (placedBuildingsByType.ContainsKey(prefab))
@@ -217,7 +228,7 @@ public class BuildingPlacer : MonoBehaviour
         return 0;
     }
 
-    // Increment the count for a specific building type
+    // Add one more to the count of placed buildings of this type
     private void IncrementBuildingCount(GameObject prefab)
     {
         if (placedBuildingsByType.ContainsKey(prefab))
@@ -230,13 +241,13 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
-    // Optional: Method to reset building counts (useful for level resets)
+    // Reset all building counts (useful when starting a new level)
     public static void ResetBuildingCounts()
     {
         placedBuildingsByType.Clear();
     }
 
-    // Optional: Method to get remaining buildings for a specific type
+    // Check how many more buildings of this type we can still place
     public int GetRemainingBuildings(GameObject prefab)
     {
         int placed = GetPlacedBuildingCount(prefab);
@@ -244,6 +255,7 @@ public class BuildingPlacer : MonoBehaviour
         return Mathf.Max(0, maxAllowed - placed);
     }
 
+    // Rotate the building 90 degrees when R is pressed
     void RotateBuilding()
     {
         if (currentBuilding != null)
@@ -260,6 +272,7 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
+    // Save the original materials so we can restore them later
     void StoreOriginalMaterials()
     {
         List<Material> originals = new List<Material>();
@@ -275,6 +288,7 @@ public class BuildingPlacer : MonoBehaviour
         originalMaterials = originals.ToArray();
     }
 
+    // Move the building preview to follow the mouse cursor
     void MoveBuildingWithMouse()
     {
         if (Camera.main == null)
@@ -292,6 +306,7 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
+    // Check if the building can be placed at the current location
     void CheckPlacementValidity()
     {
         if (gridManager == null || !gridManager.IsInitialized)
@@ -306,16 +321,17 @@ public class BuildingPlacer : MonoBehaviour
 
         if (allNodesWalkable)
         {
-            SetBuildingColor(Color.green);
+            SetBuildingColor(Color.green);  // Green means we can place it
             canPlace = true;
         }
         else
         {
-            SetBuildingColor(Color.red);
+            SetBuildingColor(Color.red);    // Red means we can't place it
             canPlace = false;
         }
     }
 
+    // Check if all the grid nodes under the building are clear
     bool AreNodesWalkable(Vector3 buildingPosition)
     {
         // Get the center node of the building
@@ -353,6 +369,7 @@ public class BuildingPlacer : MonoBehaviour
         return true;
     }
 
+    // Mark all the grid nodes under the building as unwalkable
     void SetNodesUnwalkable(Vector3 buildingPosition)
     {
         if (gridManager == null || !gridManager.IsInitialized) return;
@@ -386,15 +403,17 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
+    // Actually place the building in the world
     void PlaceBuilding()
     {
+        // Special handling for castle buildings
         if (buildingPrefab.gameObject.CompareTag("Castle"))
         {
             CastleManager.Instance.Castle = currentBuilding;
         }
 
-         // Set the nodes under the building to not walkable
-         SetNodesUnwalkable(currentBuilding.transform.position);
+        // Set the nodes under the building to not walkable
+        SetNodesUnwalkable(currentBuilding.transform.position);
 
         // Clear property blocks to restore original appearance
         if (buildingRenderers != null)
@@ -405,13 +424,14 @@ public class BuildingPlacer : MonoBehaviour
             }
         }
 
-        // Increment the count for this specific building type
+        // Keep track of how many of this building type we've placed
         IncrementBuildingCount(buildingPrefab);
 
         int currentCount = GetPlacedBuildingCount(buildingPrefab);
         int maxAllowed = GetMaxBuildingCount(buildingPrefab);
         Debug.Log($"Building '{buildingPrefab.name}' placed at {currentBuilding.transform.position}. Buildings of this type placed: {currentCount}/{maxAllowed}. Unwalkable area: {currentUnwalkableWidth}x{currentUnwalkableHeight}");
 
+        // Clean up placement variables
         currentBuilding = null;
         buildingRenderers = null;
         originalMaterials = null;
@@ -421,6 +441,7 @@ public class BuildingPlacer : MonoBehaviour
         if (buildingPrefab.gameObject.CompareTag("Castle")) Debug.LogWarning("BUILDING PLACED IS CASTLE");*/
     }
 
+    // Cancel placing the current building
     void CancelPlacement()
     {
         if (currentBuilding != null)
@@ -433,6 +454,7 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
+    // Change the color of the building preview (green = can place, red = can't place)
     void SetBuildingColor(Color color)
     {
         if (buildingRenderers == null) return;
@@ -452,6 +474,7 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
+    // Snap the building position to the grid
     Vector3 SnapToGrid(Vector3 position)
     {
         if (gridManager == null)
@@ -473,12 +496,14 @@ public class BuildingPlacer : MonoBehaviour
         return new Vector3(x_snapped, position.y, z_snapped);
     }
 
-    // Optional: Method to set building size from inspector or code
+    // Set building size from code if needed
     public void SetBuildingSize(int width, int height)
     {
         buildingWidth = width;
         buildingHeight = height;
     }
+
+    // Debug method to test collision detection
     private void OnTriggerEnter(Collider other)
     {
         Debug.LogWarning("Collider Works");

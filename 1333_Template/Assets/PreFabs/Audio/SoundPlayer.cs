@@ -5,7 +5,7 @@ using UnityEngine;
 public class SoundPlayer : MonoBehaviour
 {
     // Start is called before the first frame update
-    //AudioSource m_MyAudioSourcee;
+    
 
     public AudioClip[] soundEffects;
     public enum soundsNames
@@ -17,7 +17,7 @@ public class SoundPlayer : MonoBehaviour
 
     }
     
-    //public soundsNames Test;
+    
     public void PlaySound(soundsNames name)
     {
 

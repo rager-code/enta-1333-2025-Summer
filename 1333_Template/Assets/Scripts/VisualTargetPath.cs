@@ -23,18 +23,19 @@ public class VisualTargetPath : MonoBehaviour
     private Camera mainCamera;
     private Coroutine pathRoutine;
 
+    // Get everything ready when the game starts
     private void Awake()
     {
         SetupLineRenderer();
         mainCamera = Camera.main;
     }
-
+    // Check for mouse clicks every frame
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
             TrySetNewTargetFromClick();
     }
-
+    // Figure out what the player clicked on and see if we can move there
     private void TrySetNewTargetFromClick()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -49,33 +50,34 @@ public class VisualTargetPath : MonoBehaviour
             {
                 if (pathRoutine != null)
                     StopCoroutine(pathRoutine);
-                /*
-                                if (movingAgent.TryGetComponent(out Player_Targeting mover))
-                                    mover.StopMoving();*/
-
-                //pathRoutine = StartCoroutine(GeneratePathTo(clickedNode));
+               
             }
         }
     }
-
+    // Create a path from the agent to the target and show it visually
     public IEnumerator GeneratePathTo(GridNode targetNode, UnitBase movingAgent)
     {
+        // Clean up old target marker and place a new one
         if (endInstance != null) Destroy(endInstance);
         endNode = targetNode;
         endInstance = Instantiate(endPosPrefab, endNode.WorldPosition, Quaternion.identity);
 
+        // Get where we're starting from
         startNode = gridManager.GetNodeFromWorldPosition(movingAgent.transform.position);
 
+        // Place or move the start marker
         if (startInstance == null)
             startInstance = Instantiate(startPosPrefab, startNode.WorldPosition, Quaternion.identity);
         else
             startInstance.transform.position = startNode.WorldPosition;
-
+        // Actually calculate the path using A*
         pathNodes = pathfindingLogic.FindPath(gridManager, startNode, endNode, 1, 1);
 
+        // Add a tiny delay for each node
         foreach (GridNode node in pathNodes)
             yield return new WaitForSeconds(searchDelay);
 
+        // If we found a valid path, draw it and start moving
         if (pathNodes.Count > 0)
         {
             DrawPath(pathNodes);
@@ -90,7 +92,7 @@ public class VisualTargetPath : MonoBehaviour
 
         pathRoutine = null;
     }
-
+    // Draw the path as a line in the world
     public void DrawPath(List<GridNode> path)
     {
         if (lineRenderer == null) return;
@@ -99,7 +101,7 @@ public class VisualTargetPath : MonoBehaviour
         for (int i = 0; i < path.Count; i++)
             lineRenderer.SetPosition(i, path[i].WorldPosition + Vector3.up * 0.2f);
     }
-
+    // Set up the line renderer with some nice colors and settings
     private void SetupLineRenderer()
     {
         lineRenderer ??= gameObject.AddComponent<LineRenderer>();
@@ -111,8 +113,8 @@ public class VisualTargetPath : MonoBehaviour
         lineRenderer.useWorldSpace = true;
         lineRenderer.positionCount = 0;
     }
-
-    public void ResetField()
+    // Clean up everything when we need to reset
+    public void ResetField() 
     {
         if (pathRoutine != null) StopCoroutine(pathRoutine);
         pathRoutine = null;
@@ -122,7 +124,6 @@ public class VisualTargetPath : MonoBehaviour
 
         if (lineRenderer != null) lineRenderer.positionCount = 0;
 
-        //if (movingAgent.TryGetComponent(out Player_Targeting mover))
-        //mover.StopMoving();
+       
     }
 }

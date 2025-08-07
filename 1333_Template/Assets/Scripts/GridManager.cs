@@ -14,6 +14,7 @@ public class GridManager : MonoBehaviour
     [SerializeField] private List<GridNode> allNodes = new();
     public bool IsInitialized { get; private set; } = false;
 
+    // Sets up the entire grid with nodes and terrain types
     public void InitializeGrid()
     {
         gridNodes = new GridNode[gridSettings.GridSizeX, gridSettings.GridSizeY];
@@ -44,6 +45,8 @@ public class GridManager : MonoBehaviour
 
         IsInitialized = true;
     }
+
+    // Draws colored squares in the scene view so you can see the grid
     private void OnDrawGizmos()
     {
         if (gridNodes == null || gridSettings == null) return;
@@ -62,7 +65,8 @@ public class GridManager : MonoBehaviour
             }
         }
     }
-    
+
+    // Gets a specific node from the grid using x,y coordinates
     public GridNode GetNode(int x, int y)
     {
         if (x >= 0 && x < gridSettings.GridSizeX && y >= 0 && y < gridSettings.GridSizeY)
@@ -70,10 +74,12 @@ public class GridManager : MonoBehaviour
         return null;
     }
 
-   
 
+
+    // Returns every single node in the grid as one big list
     public List<GridNode> GetAllNodes() => allNodes;
 
+    // Finds all the nodes that are next to a given node (up, down, left, right)
     public List<GridNode> GetNeighborNodes(GridNode node)
     {
         List<GridNode> neighbors = new();
@@ -91,9 +97,11 @@ public class GridManager : MonoBehaviour
 
         return neighbors;
     }
+
+    // Takes a world position and figures out which grid node it's closest to
     public GridNode GetNodeFromWorldPosition(Vector3 position)
     {
- 
+
         int x = gridSettings.UseXZPlane
             ? Mathf.RoundToInt(position.x / gridSettings.NodeSize)
             : Mathf.RoundToInt(position.z / gridSettings.NodeSize);
@@ -101,13 +109,15 @@ public class GridManager : MonoBehaviour
             ? Mathf.RoundToInt(position.z / gridSettings.NodeSize)
             : Mathf.RoundToInt(position.y / gridSettings.NodeSize);
 
-       
+
         x = Mathf.Clamp(x, 0, gridSettings.GridSizeX - 1);
         y = Mathf.Clamp(y, 0, gridSettings.GridSizeY - 1);
 
-       
+
         return GetNode(x, y);
     }
+
+    // Gets a node using a Vector2Int instead of separate x,y values
     public GridNode GetNode(Vector2Int position)
     {
         if (position.x >= 0 && position.x < gridSettings.GridSizeX && position.y >= 0 && position.y < gridSettings.GridSizeY)

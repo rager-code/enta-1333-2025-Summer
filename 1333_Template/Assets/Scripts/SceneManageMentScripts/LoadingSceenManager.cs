@@ -9,6 +9,8 @@ public class LoadingSceenManager : MonoBehaviour
     public static LoadingSceenManager instance;
     public GameObject loadingScreenObject;
     public Slider ProgressBar;
+
+    // Make sure there's only one loading screen manager in the game
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -21,6 +23,8 @@ public class LoadingSceenManager : MonoBehaviour
             DontDestroyOnLoad(this.gameObject);
         }
     }
+
+    // Start loading a new scene and show the loading screen
     public void SwitchToScene(int id)
     {
         loadingScreenObject.SetActive(true);
@@ -28,13 +32,14 @@ public class LoadingSceenManager : MonoBehaviour
         StartCoroutine(SwitchToSceneAsyc(id));
     }
 
-    // Start is called before the first frame update
+    // Hide the loading screen when we first start up
     void Start()
     {
         loadingScreenObject.SetActive(false);
     }
 
-   IEnumerator SwitchToSceneAsyc(int id)
+    // Load the scene in the background and update the progress bar
+    IEnumerator SwitchToSceneAsyc(int id)
     {
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(id);
         while (!asyncLoad.isDone)
@@ -42,6 +47,7 @@ public class LoadingSceenManager : MonoBehaviour
             ProgressBar.value = asyncLoad.progress;
             yield return null;
         }
+        // Wait a little bit extra so people can see it finished loading
         yield return new WaitForSeconds(0.5f);
         loadingScreenObject.SetActive(false);
     }

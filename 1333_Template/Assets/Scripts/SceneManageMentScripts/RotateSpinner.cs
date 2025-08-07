@@ -13,6 +13,7 @@ public class RotateSpinner : MonoBehaviour
     }
 
     // Update is called once per frame
+    //Spins the spinner in the bottom left of the loading screen
     void Update()
     {
         transform.eulerAngles += new Vector3(0, 0, Time.deltaTime * speed);

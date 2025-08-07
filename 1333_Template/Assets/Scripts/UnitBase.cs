@@ -13,25 +13,28 @@ public abstract class UnitBase : MonoBehaviour
 
     //public abstract void MoveTo(GridNode targetNode);
 
-    
 
+
+    // Gets how wide this unit is, falls back to 1 if no unit type assigned
     public virtual int Width => unitType != null ? unitType.Width : 1;
+
+    // Gets how tall this unit is, falls back to 1 if no unit type assigned
     public virtual int Height => unitType != null ? unitType.Height : 1;
 
-    // called to assign a target node to move toward
+    // Override this to tell a unit where to go
     public virtual void MoveTo(GridNode targetNode)
     {
 
 
     }
 
-    // handles single-frame/tick movement update
+    // Override this to handle how the unit actually moves each frame
     public virtual void DoMove()
     {
 
     }
 
-    // called every frame or tick by the RTS manager
+    // Override this to add stuff that happens every game tick
     public virtual void PerTick() { }
 
 }

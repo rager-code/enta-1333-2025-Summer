@@ -24,6 +24,7 @@ public class UnitSpawner : MonoBehaviour
     private List<GameObject> spawnedUnits = new List<GameObject>();
     private bool isSpawning = false;
 
+    // Gets things ready when the game starts
     void Start()
     {
         // Find components if not assigned
@@ -39,6 +40,7 @@ public class UnitSpawner : MonoBehaviour
         }
     }
 
+    // Checks for keypresses every frame
     void Update()
     {
         // Optional: Press 'S' to start spawning manually
@@ -54,6 +56,7 @@ public class UnitSpawner : MonoBehaviour
         }
     }
 
+    // Kicks off the whole spawning process
     [ContextMenu("Start Spawning")]
     public void StartSpawning()
     {
@@ -83,6 +86,7 @@ public class UnitSpawner : MonoBehaviour
         StartCoroutine(SpawnUnitsWithDelay());
     }
 
+    // Does the actual spawning work, one unit at a time with delays
     private IEnumerator SpawnUnitsWithDelay()
     {
         isSpawning = true;
@@ -123,6 +127,7 @@ public class UnitSpawner : MonoBehaviour
         Debug.Log($"Finished spawning all {unitsToSpawn} units!");
     }
 
+    // Figures out where to put each unit so they don't overlap
     private Vector3 GetValidSpawnPosition(int unitIndex)
     {
         Vector3 spawnPosition = spawnAreaCenter;
@@ -169,6 +174,7 @@ public class UnitSpawner : MonoBehaviour
         return spawnPosition;
     }
 
+    // Gets a unit ready after it's been created
     private void SetupUnit(GameObject unit, int unitIndex)
     {
         // Name the unit
@@ -189,6 +195,7 @@ public class UnitSpawner : MonoBehaviour
         InitializeUnitComponents(unit, unitIndex);
     }
 
+    // Adds extra stuff to each unit like colors and IDs
     private void InitializeUnitComponents(GameObject unit, int unitIndex)
     {
         // Add any additional unit initialization here
@@ -211,6 +218,7 @@ public class UnitSpawner : MonoBehaviour
         }
     }
 
+    // Destroys all the units we've spawned
     [ContextMenu("Clear All Units")]
     public void ClearAllUnits()
     {
@@ -226,6 +234,7 @@ public class UnitSpawner : MonoBehaviour
         Debug.Log("All spawned units cleared.");
     }
 
+    // Wipes everything clean and starts fresh
     public void ResetAllUnits()
     {
         // Stop spawning if in progress
@@ -244,7 +253,7 @@ public class UnitSpawner : MonoBehaviour
         Debug.Log("All units reset and command field cleared.");
     }
 
-    // Public getters
+    // Returns a copy of all the units we've made
     public List<GameObject> GetSpawnedUnits()
     {
         // Remove null references (destroyed units)
@@ -252,31 +261,34 @@ public class UnitSpawner : MonoBehaviour
         return new List<GameObject>(spawnedUnits);
     }
 
+    // Tells you if we're currently making units
     public bool IsSpawning()
     {
         return isSpawning;
     }
 
+    // Counts how many units are still alive
     public int GetSpawnedUnitCount()
     {
         spawnedUnits.RemoveAll(unit => unit == null);
         return spawnedUnits.Count;
     }
 
-    // Configuration methods
+    // Lets you change how many units to spawn and the delay between them
     public void SetSpawnSettings(int unitCount, float delay)
     {
         unitsToSpawn = Mathf.Max(1, unitCount);
         spawnDelay = Mathf.Max(0.1f, delay);
     }
 
+    // Changes where units spawn and how spread out they are
     public void SetSpawnArea(Vector3 center, float radius)
     {
         spawnAreaCenter = center;
         spawnRadius = Mathf.Max(1f, radius);
     }
 
-    // Gizmos for visualization
+    // Draws helpful stuff in the scene view so you can see the spawn area
     private void OnDrawGizmos()
     {
         if (!drawSpawnArea) return;
@@ -308,6 +320,9 @@ public class UnitIdentifier : MonoBehaviour
 {
     [SerializeField] private int unitID;
 
+    // Gets this unit's unique ID number
     public int GetUnitID() => unitID;
+
+    // Sets this unit's unique ID number
     public void SetUnitID(int id) => unitID = id;
 }

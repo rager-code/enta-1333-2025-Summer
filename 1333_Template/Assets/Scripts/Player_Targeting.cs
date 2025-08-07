@@ -8,6 +8,7 @@ public class Player_Targeting : MonoBehaviour
 
     private Coroutine moveRoutine;
 
+    // Stops any current movement and starts following a new path
     public void StartMoving(List<GridNode> path)
     {
         //Debug.Log("StartingMoving------");
@@ -17,6 +18,7 @@ public class Player_Targeting : MonoBehaviour
         moveRoutine = StartCoroutine(MoveAlongPath(path));
     }
 
+    // Cancels all movement and makes the unit stop where it is
     public void StopMoving()
     {
         if (moveRoutine != null)
@@ -26,7 +28,8 @@ public class Player_Targeting : MonoBehaviour
         }
         // Reset velocity/animation here if you want
     }
-    
+
+    // Handles the actual movement from point to point along the path
     private IEnumerator MoveAlongPath(List<GridNode> path)
     {
         foreach (GridNode node in path)

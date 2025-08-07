@@ -3,21 +3,24 @@ using UnityEngine.UI;
 
 public class SimpleHealth : MonoBehaviour
 {
+    // Health system variables
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] public float currentHealth;
     [SerializeField] private Slider healthSlider;
     [SerializeField] private Camera mCamera;
     [SerializeField] private Transform healthBarTransform; // Reference to the health bar's transform
 
+    // Easy access properties to check health status from other scripts
     public float Health => currentHealth;
     public bool IsDead => currentHealth <= 0;
 
+    // Initialize the health system
     private void Start()
     {
         currentHealth = maxHealth;
         UpdateHealthSlider();
 
-        // If no camera is assigned, try to find the main camera
+        // Try to find a camera if none is assigned
         if (mCamera == null)
         {
             mCamera = Camera.main;
@@ -26,16 +29,12 @@ public class SimpleHealth : MonoBehaviour
                 mCamera = FindObjectOfType<Camera>();
             }
         }
-
-        /*// If no health bar transform is assigned, use this transform
-        if (healthBarTransform == null)
-        {
-            healthBarTransform = transform;
-        }*/
     }
 
+    // Handle input and updates every frame
     private void Update()
     {
+        // Testing keys - P to take damage, O to heal
         if (Input.GetKeyUp(KeyCode.P))
         {
             TakeDamage(20);
@@ -44,36 +43,33 @@ public class SimpleHealth : MonoBehaviour
         {
             Heal(50);
         }
-        
+
         EnemyInCastle();
-        // Make health bar look at camera
-        
     }
+
+    // Update after everything else to ensure health bar faces camera correctly
     private void LateUpdate()
     {
         LookAtCamera();
     }
+
+    // Make the health bar always face the camera so players can read it
     private void LookAtCamera()
     {
         if (mCamera != null && healthBarTransform != null)
         {
-            // Make the health bar look at the camera
+            // Calculate direction from health bar to camera and face that way
             Vector3 directionToCamera = mCamera.transform.position - healthBarTransform.position;
             healthBarTransform.rotation = Quaternion.LookRotation(directionToCamera);
-
-            // Alternative approach - billboard effect (always faces camera)
-            // healthBarTransform.LookAt(mCamera.transform);
-
-            // If you want the health bar to only rotate on Y-axis (vertical billboard)
-            // Vector3 targetPosition = new Vector3(mCamera.transform.position.x, healthBarTransform.position.y, mCamera.transform.position.z);
-            // healthBarTransform.LookAt(targetPosition);
         }
     }
 
+    // Reduce health when taking damage
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
 
+        // Die if health reaches zero or below
         if (currentHealth <= 0)
         {
             currentHealth = 0;
@@ -83,18 +79,21 @@ public class SimpleHealth : MonoBehaviour
         UpdateHealthSlider();
     }
 
+    // Handle death - destroy the game object
     public void Die()
     {
         Destroy(gameObject);
         Debug.Log($"Dead Unit");
     }
 
+    // Restore health but don't exceed maximum
     public void Heal(float amount)
     {
         currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
         UpdateHealthSlider();
     }
 
+    // Update the health bar slider to show current health percentage
     private void UpdateHealthSlider()
     {
         if (healthSlider != null)
@@ -102,12 +101,13 @@ public class SimpleHealth : MonoBehaviour
             healthSlider.value = currentHealth / maxHealth;
         }
     }
+
+    // Special damage for when enemies reach the castle
     public void EnemyInCastle()
     {
         if (Input.GetKeyUp(KeyCode.L))
         {
             TakeDamage(50);
         }
-       
     }
 }

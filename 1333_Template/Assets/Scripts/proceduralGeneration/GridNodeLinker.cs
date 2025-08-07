@@ -1,59 +1,48 @@
 using UnityEngine;
 
-/// <summary>
-/// Component that links instantiated terrain prefabs back to their corresponding GridNode
-/// This allows you to access the GridNode data from the visual representation
-/// </summary>
+
 public class GridNodeLinker : MonoBehaviour
 {
     [SerializeField] private GridNode linkedNode;
 
+    // Simple getter/setter to access the linked grid node
     public GridNode LinkedNode
     {
         get => linkedNode;
         set => linkedNode = value;
     }
 
-    /// <summary>
-    /// Get the terrain type of the linked node
-    /// </summary>
+    // Get what type of terrain this node represents
     public TerrainType GetTerrainType()
     {
         return linkedNode?.terrainType;
     }
 
-    /// <summary>
-    /// Check if the linked node is walkable
-    /// </summary>
+    // Check if units can walk on this terrain
     public bool IsWalkable()
     {
         return linkedNode?.walkable ?? false;
     }
 
-    /// <summary>
-    /// Get the movement cost for the linked node
-    /// </summary>
+    // Get how much it costs to move through this terrain
     public int GetMovementCost()
     {
         return linkedNode?.MovementCost ?? 1;
     }
 
-    /// <summary>
-    /// Get the world position of the linked node
-    /// </summary>
+    // Get the exact world position of this grid node
     public Vector3 GetNodeWorldPosition()
     {
         return linkedNode?.WorldPosition ?? Vector3.zero;
     }
 
-    /// <summary>
-    /// Check if this prefab has a valid linked node
-    /// </summary>
+    // Check if this component actually has a node connected to it
     public bool HasLinkedNode()
     {
         return linkedNode != null;
     }
 
+    // Automatically update the object name to match the terrain type (helpful for debugging)
     private void OnValidate()
     {
         // Update the name to reflect the linked node
@@ -62,18 +51,6 @@ public class GridNodeLinker : MonoBehaviour
             gameObject.name = $"{linkedNode.terrainType?.TerrainName ?? "Unknown"}_{linkedNode.Name}";
         }
     }
-    /*
-    private void OnDrawGizmosSelected()
-    {
-        if (linkedNode != null)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireCube(linkedNode.WorldPosition, Vector3.one * 0.5f);
 
-            // Draw a line connecting the prefab to the node position
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawLine(transform.position, linkedNode.WorldPosition);
-        }
-    }
-    */
+   
 }

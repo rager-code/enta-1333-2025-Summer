@@ -4,14 +4,16 @@ using UnityEngine;
 
 public class BuildingPlaceMentUi : MonoBehaviour
 {
-    [SerializeField] private RectTransform LayoutGroupParent;
-    [SerializeField] private SelectingBuildingButton ButtonPrefab;
-    [SerializeField] private BuildingTypeSo BuildingData;
-    [SerializeField] private BuildingPlacer buildingPlacer; // Add reference to BuildingPlacer
+    // UI setup references
+    [SerializeField] private RectTransform LayoutGroupParent;    // Where to put the building buttons
+    [SerializeField] private SelectingBuildingButton ButtonPrefab;  // Template for building buttons
+    [SerializeField] private BuildingTypeSo BuildingData;        // All the building types we can build
+    [SerializeField] private BuildingPlacer buildingPlacer;     // The system that handles placing buildings
 
+    // Create all the building selection buttons when we start
     private void Start()
     {
-        // Find BuildingPlacer if not assigned in inspector
+        // Find BuildingPlacer if we forgot to assign it in the inspector
         if (buildingPlacer == null)
         {
             buildingPlacer = FindObjectOfType<BuildingPlacer>();
@@ -23,10 +25,11 @@ public class BuildingPlaceMentUi : MonoBehaviour
             return;
         }
 
+        // Create a button for each building type we have
         foreach (BuildingData t in BuildingData.Buildings)
         {
             SelectingBuildingButton button = Instantiate(ButtonPrefab, LayoutGroupParent);
-            button.SetUp(t, buildingPlacer); // Pass the BuildingPlacer reference
+            button.SetUp(t, buildingPlacer); // Set up the button with the building info and placer
         }
     }
 }
