@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class EnemyBarracksSpawner : MonoBehaviour
@@ -13,7 +14,6 @@ public class EnemyBarracksSpawner : MonoBehaviour
     public AStarPathfinding astarPathfinding;
     public VisualTargetPath visualTargetPath;
 
-
     [Header("Castle Targeting")]
     public bool waitForCastle = true; // Wait for castle before spawning
     public bool onlySpawnAfterCastle = true; // Only spawn units after castle is placed
@@ -21,18 +21,29 @@ public class EnemyBarracksSpawner : MonoBehaviour
     private GameObject currentCastle;
     private bool castleFound = false;
 
-
     [Header("AI Controls")]
     public Camera playerCamera; // Assign your main camera
     public LayerMask groundLayerMask = 1; // Layer mask for ground/walkable areas
     public bool enableAIMovement = true;
-    public float spawnInterval = 5f; // Time between automatic spawns
+    public float spawnInterval = 15f; // Time between automatic spawns
     public int maxUnits = 10; // Maximum units this barracks can have
 
     [Header("Target Prefabs")]
     public List<GameObject> targetPrefabs = new List<GameObject>(); // List of target prefabs to attack
     public bool useRandomTargetSelection = true; // Whether to randomly select targets or use all
     public float retargetInterval = 10f; // Time between retargeting units
+
+    [Header("Health Reference")]
+    public SimpleHealth targetHealth; // Reference to the castle's health script
+
+    [Header("Combat Settings")]
+    public float proximityCheckInterval = 0.5f; // How often to check unit proximity to targets
+    public bool destroyOnReachTarget = true; // Enable/disable destroying units when they reach target
+    public float destructionDistance = 2f; // Distance in world units to destroy enemies (approximately 1 node)
+
+    [Header("Pathfinding Settings")]
+    public int maxSearchRadius = 10; // Maximum radius to search for walkable nodes
+    public float searchStepSize = 1f; // Step size for searching (world units)
 
     // Static list to track ALL enemy units from ALL enemy barracks
     private static List<UnitInstance> allEnemyUnits = new List<UnitInstance>();
@@ -41,10 +52,10 @@ public class EnemyBarracksSpawner : MonoBehaviour
 
     private float lastSpawnTime;
     private float lastRetargetTime;
+    private float lastProximityCheckTime;
 
     private void Start()
     {
-
         if (gridManager == null)
         {
             gridManager = FindAnyObjectByType<GridManager>();
@@ -64,64 +75,28 @@ public class EnemyBarracksSpawner : MonoBehaviour
 
         lastSpawnTime = Time.time;
         lastRetargetTime = Time.time;
-
-        /*CastleManager.OnCastlePlaced += OnCastlePlaced;
-        CastleManager.OnCastleDestroyed += OnCastleDestroyed;
-
-        // Check if castle already exists
-        if (CastleManager.HasCastle())
-        {
-            OnCastlePlaced(CastleManager.CurrentCastle);
-        }*/
+        lastProximityCheckTime = Time.time;
     }
-    private void FindAndAddCastle()
-    {
-        // Try to find castle by name first
-        GameObject castle = GameObject.Find("Castle");
-
-        // If not found by name, try finding by tag (make sure to tag your castle with "Castle")
-        if (castle == null)
-        {
-            castle = GameObject.FindGameObjectWithTag("Castle");
-        }
-
-        // If still not found, try finding any object with "castle" in the name (case insensitive)
-        if (castle == null)
-        {
-            GameObject[] allObjects = FindObjectsOfType<GameObject>();
-            foreach (GameObject obj in allObjects)
-            {
-                if (obj.name.ToLower().Contains("castle"))
-                {
-                    castle = obj;
-                    break;
-                }
-            }
-        }
-
-        if (castle != null)
-        {
-            // Clear existing targets and add the castle
-            targetPrefabs.Clear();
-            targetPrefabs.Add(castle);
-            Debug.Log($"Found and added castle: {castle.name} at position {castle.transform.position}");
-        }
-        else
-        {
-            Debug.LogWarning("Could not find castle prefab! Make sure it exists in the scene and is named 'Castle' or tagged with 'Castle'");
-        }
-    }
-
+    
     private void Update()
     {
+        bool canSpawn = !onlySpawnAfterCastle || castleFound;
+
         // Automatic spawning based on interval
-        if (enableAIMovement && Time.time - lastSpawnTime > spawnInterval)
+        if (enableAIMovement && canSpawn && Time.time - lastSpawnTime > spawnInterval)
         {
             if (myEnemyUnits.Count < maxUnits)
             {
                 SpawnEnemyUnit();
                 lastSpawnTime = Time.time;
             }
+        }
+
+        // Check unit proximity to targets
+        if (destroyOnReachTarget && Time.time - lastProximityCheckTime > proximityCheckInterval)
+        {
+            CheckUnitProximityToTargets();
+            lastProximityCheckTime = Time.time;
         }
 
         // Retarget units periodically
@@ -134,19 +109,10 @@ public class EnemyBarracksSpawner : MonoBehaviour
         // Manual keyboard controls for testing
         if (Input.GetKeyDown(KeyCode.K))
         {
-            MoveAllEnemyUnitsToTarget(currentCastle.transform); // Moves ALL enemy units to this barracks target
+           // MoveAllEnemyUnitsToTarget(currentCastle.transform); // Moves ALL enemy units to this barracks target
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            SpawnEnemyUnit();
-        }
-
-        // Move only units from THIS enemy barracks
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            MoveMyEnemyUnitsOnly();
-        }
+       
 
         // Optional: Clear all enemy units from ALL enemy barracks with N key
         if (Input.GetKeyDown(KeyCode.N))
@@ -159,80 +125,222 @@ public class EnemyBarracksSpawner : MonoBehaviour
         {
             ClearMyEnemyUnits();
         }
-        bool canSpawn = !onlySpawnAfterCastle || castleFound;
-
-        // Automatic spawning based on interval
-        if (enableAIMovement && canSpawn && Time.time - lastSpawnTime > spawnInterval)
-        {
-            if (myEnemyUnits.Count < maxUnits)
-            {
-                SpawnEnemyUnit();
-                lastSpawnTime = Time.time;
-            }
-        }
     }
 
-    private void MoveMyEnemyUnitsToNewTarget(Vector3 newTargetPosition)
+    /// <summary>
+    /// Finds the nearest walkable node to a given target position
+    /// </summary>
+    /// <param name="targetPosition">The world position to find nearest walkable node for</param>
+    /// <returns>The nearest walkable GridNode, or null if none found within search radius</returns>
+    private GridNode FindNearestWalkableNode(Vector3 targetPosition)
     {
-        myEnemyUnits.RemoveAll(unit => unit == null);
+        GridNode originalNode = gridManager.GetNodeFromWorldPosition(targetPosition);
 
-        GridNode targetNode = gridManager.GetNodeFromWorldPosition(newTargetPosition);
-        if (targetNode != null)
+        // If the original node is walkable, return it
+        if (originalNode != null && originalNode.walkable)
         {
-            foreach (UnitInstance unit in myEnemyUnits)
+            return originalNode;
+        }
+
+        Debug.Log($"Target position {targetPosition} is on unwalkable node, searching for nearest walkable node...");
+
+        GridNode bestNode = null;
+        float shortestDistance = float.MaxValue;
+
+        // Search in expanding radius around the target position using world units
+        for (int radius = 1; radius <= maxSearchRadius; radius++)
+        {
+            float searchRadius = radius * searchStepSize;
+
+            // Check positions in a circle pattern around the target
+            int numPoints = Mathf.Max(8, radius * 8); // More points for larger radii
+
+            for (int i = 0; i < numPoints; i++)
             {
-                if (unit != null)
+                float angle = (float)i / numPoints * 2f * Mathf.PI;
+                Vector3 offset = new Vector3(
+                    Mathf.Cos(angle) * searchRadius,
+                    0,
+                    Mathf.Sin(angle) * searchRadius
+                );
+
+                Vector3 checkPosition = targetPosition + offset;
+                GridNode checkNode = gridManager.GetNodeFromWorldPosition(checkPosition);
+
+                if (checkNode != null && checkNode.walkable)
                 {
-                    unit.MoveTo(targetNode);
-                    Debug.Log($"Moving enemy unit {unit.name} to new target {targetNode}");
+                    float distance = Vector3.Distance(targetPosition, checkNode.WorldPosition);
+                    if (distance < shortestDistance)
+                    {
+                        shortestDistance = distance;
+                        bestNode = checkNode;
+                    }
                 }
             }
 
-            if (myEnemyUnits.Count > 0)
+            // If we found a walkable node at this radius, return it (closest possible)
+            if (bestNode != null)
             {
-                Debug.Log($"Moved {myEnemyUnits.Count} enemy units to new position");
+                Debug.Log($"Found nearest walkable node at distance {shortestDistance} from target position");
+                return bestNode;
             }
         }
-        else
-        {
-            Debug.Log($"Couldn't find valid node at target position: {newTargetPosition}");
-        }
+
+        Debug.LogWarning($"Could not find any walkable node within radius {maxSearchRadius * searchStepSize} world units of target position {targetPosition}");
+        return null;
     }
 
-    public void MoveAllEnemyUnitsToTarget(Transform target)
+    /// <summary>
+    /// Gets a safe target node for a given prefab, automatically finding nearest walkable if needed
+    /// </summary>
+    /// <param name="targetPrefab">The GameObject to target</param>
+    /// <returns>A walkable GridNode near the target, or null if none found</returns>
+    private GridNode GetSafeTargetNode(GameObject targetPrefab)
     {
-        // Clean up destroyed units from both lists
+        if (targetPrefab == null) return null;
+
+        return FindNearestWalkableNode(targetPrefab.transform.position);
+    }
+
+    // New method to check if units are close to their targets
+    private void CheckUnitProximityToTargets()
+    {
+        // Clean up destroyed units first
         allEnemyUnits.RemoveAll(unit => unit == null);
         myEnemyUnits.RemoveAll(unit => unit == null);
 
-        GridNode targetNode = gridManager.GetNodeFromWorldPosition(target.position);
-        if (targetNode != null)
+        List<UnitInstance> unitsToDestroy = new List<UnitInstance>();
+
+        foreach (UnitInstance unit in allEnemyUnits)
         {
-            // Move ALL enemy units from ALL enemy barracks to this target position
-            foreach (UnitInstance unit in allEnemyUnits)
+            if (unit != null)
             {
-                if (unit != null)
+                Vector3 unitPosition = unit.transform.position;
+
+                // Check distance to castle (primary target)
+                if (CastleManager.Instance != null && CastleManager.Instance.Castle != null)
                 {
-                    unit.MoveTo(targetNode);
-                    Debug.Log($"Moving enemy unit {unit.name} to {targetNode}");
+                    Vector3 castlePosition = CastleManager.Instance.Castle.transform.position;
+                    float distance = Vector3.Distance(unitPosition, castlePosition);
+
+                    // Check if unit is within destruction distance
+                    if (distance <= destructionDistance)
+                    {
+                        Debug.Log($"Enemy unit {unit.name} reached castle target - destroying!");
+                        unitsToDestroy.Add(unit);
+                        continue;
+                    }
+                }
+
+                // Check distance to other target prefabs
+                foreach (GameObject targetPrefab in targetPrefabs)
+                {
+                    if (targetPrefab != null)
+                    {
+                        Vector3 targetPosition = targetPrefab.transform.position;
+                        float distance = Vector3.Distance(unitPosition, targetPosition);
+
+                        // Check if unit is within destruction distance
+                        if (distance <= destructionDistance)
+                        {
+                            Debug.Log($"Enemy unit {unit.name} reached target {targetPrefab.name} - destroying!");
+                            unitsToDestroy.Add(unit);
+                            break; // No need to check other targets for this unit
+                        }
+                    }
                 }
             }
-
-            if (allEnemyUnits.Count > 0)
-            {
-                Debug.Log($"Updated position for {allEnemyUnits.Count} total enemy units to move to this enemy barracks");
-            }
-            else
-            {
-                Debug.Log("No existing enemy units to move");
-            }
         }
-        else
+
+        // Destroy units that reached their targets
+        foreach (UnitInstance unit in unitsToDestroy)
         {
-            Debug.Log("Couldn't find enemy target node");
+            DestroyEnemyUnit(unit);
         }
     }
 
+    // Helper method to properly destroy an enemy unit
+    private void DestroyEnemyUnit(UnitInstance unit)
+    {
+        if (unit != null)
+        {
+            // Try to get target health if we don't have it
+            if (targetHealth == null)
+            {
+                TryFindTargetHealth();
+            }
+
+            // Call EnemyInCastle when unit reaches target (deals damage to castle)
+            if (targetHealth != null)
+            {
+                targetHealth.EnemyInCastle();
+                Debug.Log($"Enemy unit {unit.name} reached castle - dealt 50 damage! Castle health: {targetHealth.Health}");
+            }
+            else
+            {
+                Debug.LogWarning("No target health found - cannot deal damage! Reasons could be:");
+                Debug.LogWarning("1. Castle not spawned yet");
+                Debug.LogWarning("2. Castle doesn't have SimpleHealth component");
+                Debug.LogWarning("3. CastleManager.Instance.Castle is null");
+
+                // Try one more time to find it
+                TryFindTargetHealth();
+                if (targetHealth != null)
+                {
+                    targetHealth.EnemyInCastle();
+                    Debug.Log($"Found target health on second try - dealt damage!");
+                }
+            }
+
+            // Remove from both tracking lists
+            allEnemyUnits.Remove(unit);
+            myEnemyUnits.Remove(unit);
+
+            // Destroy the game object
+            Destroy(unit.gameObject);
+
+            Debug.Log($"Destroyed enemy unit {unit.name} that reached its target");
+        }
+    }
+
+    // Helper method to find target health
+    private void TryFindTargetHealth()
+    {
+        // Method 1: Try CastleManager
+        if (CastleManager.Instance?.Castle != null)
+        {
+            targetHealth = CastleManager.Instance.Castle.GetComponent<SimpleHealth>();
+            if (targetHealth != null)
+            {
+                Debug.Log("Found target health via CastleManager!");
+                return;
+            }
+        }
+
+        // Method 2: Find any SimpleHealth in scene
+        targetHealth = FindObjectOfType<SimpleHealth>();
+        if (targetHealth != null)
+        {
+            Debug.Log($"Found target health via FindObjectOfType on: {targetHealth.gameObject.name}");
+            return;
+        }
+
+        // Method 3: Search by tag (if your castle has a specific tag)
+        GameObject castle = GameObject.FindGameObjectWithTag("Castle");
+        if (castle != null)
+        {
+            targetHealth = castle.GetComponent<SimpleHealth>();
+            if (targetHealth != null)
+            {
+                Debug.Log("Found target health via Castle tag!");
+                return;
+            }
+        }
+
+        Debug.LogError("Could not find target health using any method!");
+    }
+
+   
     public void SpawnEnemyUnit()
     {
         if (enemyUnitPrefab == null || enemySpawnPoint == null) return;
@@ -245,123 +353,32 @@ public class EnemyBarracksSpawner : MonoBehaviour
         allEnemyUnits.Add(unit);
         myEnemyUnits.Add(unit);
 
-        // Get a target prefab instead of random node
-        //GameObject targetPrefab = GetTargetPrefab()
-        GameObject targetPrefab = CastleManager.Instance.Castle;
-
-        Debug.Log($"SETTING ENEMY UNIT TO {targetPrefab}: NODE {gridManager.GetNodeFromWorldPosition(targetPrefab.transform.position)}");
+        // Get the castle as target
+        GameObject targetPrefab = CastleManager.Instance?.Castle;
 
         if (targetPrefab != null)
         {
-            GridNode targetNode = gridManager.GetNodeFromWorldPosition(targetPrefab.transform.position);
+            Debug.Log($"Targeting enemy unit to {targetPrefab.name} at position {targetPrefab.transform.position}");
 
-            Debug.LogWarning(targetNode.WorldPosition);
-            Debug.LogWarning(targetNode.walkable);
-            if (targetNode != null)
+            // Use the safe target node method
+            GridNode safeTargetNode = GetSafeTargetNode(targetPrefab);
+
+            if (safeTargetNode != null)
             {
-                unit.MoveTo(targetNode);
-                Debug.Log($"Spawned new enemy unit {unit.name} and moving to target prefab {targetPrefab.name}");
+                unit.MoveTo(safeTargetNode);
+                Debug.Log($"Spawned new enemy unit {newEnemyUnit.name} and moving to safe target node at {safeTargetNode.WorldPosition}");
             }
             else
             {
-                Debug.Log($"Couldn't find valid node for target prefab {targetPrefab.name}");
-                // Fallback to original target point
-                FallbackToOriginalTarget(unit);
+                Debug.LogError($"Could not find a safe walkable node near target {targetPrefab.name}!");
+                // Optionally destroy the unit if no valid path can be found
+                DestroyEnemyUnit(unit);
             }
         }
         else
         {
-            Debug.Log("No target prefabs assigned, using fallback target");
-            // Fallback to original target if no prefabs assigned
-            FallbackToOriginalTarget(unit);
-        }
-    }
-
-    private void FallbackToOriginalTarget(UnitInstance unit)
-    {
-        GridNode fallbackTargetNode = gridManager.GetNodeFromWorldPosition(enemyTargetPoint.position);
-        if (fallbackTargetNode != null)
-        {
-            unit.MoveTo(fallbackTargetNode);
-            Debug.Log($"Moving enemy unit {unit.name} to fallback target {fallbackTargetNode}");
-        }
-        else
-        {
-            Debug.Log("Couldn't find any valid target node for spawned unit");
-        }
-    }
-
-    // Get a target prefab based on selection method
-    private GameObject GetTargetPrefab()
-    {
-        if (targetPrefabs == null || targetPrefabs.Count == 0)
-        {
-            return null;
-        }
-
-        // Remove null references
-        targetPrefabs.RemoveAll(prefab => prefab == null);
-
-        if (targetPrefabs.Count == 0)
-        {
-            return null;
-        }
-
-        if (useRandomTargetSelection)
-        {
-            // Return a random target prefab
-            int randomIndex = Random.Range(0, targetPrefabs.Count);
-            return targetPrefabs[randomIndex];
-        }
-        else
-        {
-            // Return the first available target prefab
-            return targetPrefabs[0];
-        }
-    }
-
-    // Retarget existing units to new prefab targets
-    /*
-    private void RetargetUnits()
-    {
-        myEnemyUnits.RemoveAll(unit => unit == null);
-
-        foreach (UnitInstance unit in myEnemyUnits)
-        {
-            if (unit != null)
-            {
-                GameObject targetPrefab = GetTargetPrefab();
-                if (targetPrefab != null)
-                {
-                    GridNode targetNode = gridManager.GetNodeFromWorldPosition(targetPrefab.transform.position);
-                    if (targetNode != null)
-                    {
-                        unit.MoveTo(targetNode);
-                        Debug.Log($"Retargeting enemy unit {unit.name} to prefab {targetPrefab.name}");
-                    }
-                }
-            }
-        }
-    }
-    */
-    // Method to move only units spawned by THIS enemy barracks
-    public void MoveMyEnemyUnitsOnly()
-    {
-        myEnemyUnits.RemoveAll(unit => unit == null);
-
-        GridNode targetNode = gridManager.GetNodeFromWorldPosition(enemyTargetPoint.position);
-        if (targetNode != null)
-        {
-            foreach (UnitInstance unit in myEnemyUnits)
-            {
-                if (unit != null)
-                {
-                    unit.MoveTo(targetNode);
-                    Debug.Log($"Moving my enemy unit {unit.name} to {targetNode}");
-                }
-            }
-
-            Debug.Log($"Moved {myEnemyUnits.Count} enemy units from this barracks");
+            Debug.LogWarning("No target castle found!");
+            // Optionally destroy or handle units when no target exists
         }
     }
 
@@ -369,7 +386,7 @@ public class EnemyBarracksSpawner : MonoBehaviour
     public void SetEnemyTargetPosition(Vector3 newPosition)
     {
         enemyTargetPoint.position = newPosition;
-        MoveMyEnemyUnitsToNewTarget(newPosition);
+        //MoveMyEnemyUnitsToNewTarget(newPosition);
     }
 
     // Method to toggle AI movement functionality
@@ -391,6 +408,41 @@ public class EnemyBarracksSpawner : MonoBehaviour
     {
         retargetInterval = interval;
         Debug.Log($"Enemy retarget interval set to: {interval} seconds");
+    }
+
+    // Method to set proximity check interval
+    public void SetProximityCheckInterval(float interval)
+    {
+        proximityCheckInterval = interval;
+        Debug.Log($"Enemy proximity check interval set to: {interval} seconds");
+    }
+
+    // Method to set destruction distance
+    public void SetDestructionDistance(float distance)
+    {
+        destructionDistance = distance;
+        Debug.Log($"Enemy destruction distance set to: {distance} units");
+    }
+
+    // Method to set max search radius for finding walkable nodes
+    public void SetMaxSearchRadius(int radius)
+    {
+        maxSearchRadius = radius;
+        Debug.Log($"Max search radius set to: {radius} steps");
+    }
+
+    // Method to set search step size
+    public void SetSearchStepSize(float stepSize)
+    {
+        searchStepSize = stepSize;
+        Debug.Log($"Search step size set to: {stepSize} world units");
+    }
+
+    // Method to toggle destroy on reach target
+    public void SetDestroyOnReachTarget(bool enabled)
+    {
+        destroyOnReachTarget = enabled;
+        Debug.Log($"Destroy on reach target: {(enabled ? "Enabled" : "Disabled")}");
     }
 
     // Method to add a target prefab
@@ -497,54 +549,12 @@ public class EnemyBarracksSpawner : MonoBehaviour
                 }
             }
         }
-    }
-    /*private void OnDestroy()
-    {
-        // Unsubscribe from events to prevent memory leaks
-        CastleManager.OnCastlePlaced -= OnCastlePlaced;
-        CastleManager.OnCastleDestroyed -= OnCastleDestroyed;
-    }
-*/
-    private void OnCastlePlaced(GameObject castle)
-    {
-        currentCastle = castle;
-        castleFound = true;
 
-        // Clear existing targets and add the castle
-        targetPrefabs.Clear();
-        targetPrefabs.Add(castle);
-
-        Debug.Log($"Enemy barracks {name} now targeting castle at: {castle.transform.position}");
-
-        // Retarget existing units to the castle
-        RetargetUnitsToCurrentCastle();
-    }
-    private void OnCastleDestroyed()
-    {
-        currentCastle = null;
-        castleFound = false;
-        targetPrefabs.Clear();
-
-        Debug.Log($"Enemy barracks {name} lost castle target");
-    }
-    private void RetargetUnitsToCurrentCastle()
-    {
-        if (currentCastle == null) return;
-
-        myEnemyUnits.RemoveAll(unit => unit == null);
-
-        GridNode castleNode = gridManager.GetNodeFromWorldPosition(currentCastle.transform.position);
-        if (castleNode != null)
+        // Visualize search radius for nearest walkable node
+        if (CastleManager.Instance != null && CastleManager.Instance.Castle != null)
         {
-            foreach (UnitInstance unit in myEnemyUnits)
-            {
-                if (unit != null)
-                {
-                    unit.MoveTo(castleNode);
-                    Debug.Log($"Retargeting {unit.name} to newly placed castle");
-                }
-            }
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(CastleManager.Instance.Castle.transform.position, maxSearchRadius * searchStepSize);
         }
     }
-
 }

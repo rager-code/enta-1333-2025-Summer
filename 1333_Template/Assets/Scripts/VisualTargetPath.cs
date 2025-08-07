@@ -41,14 +41,17 @@ public class VisualTargetPath : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
+            Debug.Log("gridmanager:" + gridManager);
+            
+
             GridNode clickedNode = gridManager.GetNodeFromWorldPosition(hit.point);
             if (clickedNode != null && clickedNode.walkable)
             {
                 if (pathRoutine != null)
                     StopCoroutine(pathRoutine);
-/*
-                if (movingAgent.TryGetComponent(out Player_Targeting mover))
-                    mover.StopMoving();*/
+                /*
+                                if (movingAgent.TryGetComponent(out Player_Targeting mover))
+                                    mover.StopMoving();*/
 
                 //pathRoutine = StartCoroutine(GeneratePathTo(clickedNode));
             }
@@ -120,6 +123,6 @@ public class VisualTargetPath : MonoBehaviour
         if (lineRenderer != null) lineRenderer.positionCount = 0;
 
         //if (movingAgent.TryGetComponent(out Player_Targeting mover))
-            //mover.StopMoving();
+        //mover.StopMoving();
     }
 }

@@ -15,7 +15,7 @@ MonoBehaviour:
   Buildings:
   - buildingPrefab: {fileID: 7166442863630188804, guid: 8c52da2ede40de141a0cb85d3187d6a6, type: 3}
     BuildingName: Wall
-    BuildingIcon: {fileID: 21300000, guid: 4e189178a052ac34cb5556af803d80ad, type: 3}
+    BuildingIcon: {fileID: 21300000, guid: 3dd51dd35d8dffe44ae73237e67e3f5d, type: 3}
   - buildingPrefab: {fileID: 6041842344366963134, guid: a944170b0f2404f40a5c9c844f4285f8, type: 3}
     BuildingName: Gate
     BuildingIcon: {fileID: 21300000, guid: 6f89891445b8a7b44a5b90f546cc6d1a, type: 3}
@@ -23,7 +23,7 @@ MonoBehaviour:
     BuildingName: Tower
     BuildingIcon: {fileID: 21300000, guid: 130639a528f40494dae6a317c8ca5f37, type: 3}
   - buildingPrefab: {fileID: 7469653825664661077, guid: 9716d480dd26f724690f7833dadf1945, type: 3}
-    BuildingName: ArcherTower
+    BuildingName: Archery
     BuildingIcon: {fileID: 21300000, guid: 7ca1f4c43f4410a43b6ef09aed2d56c7, type: 3}
   - buildingPrefab: {fileID: 2329828625171672870, guid: d5c528b89f1c8d94eab7671633689922, type: 3}
     BuildingName: Barracks

@@ -61,11 +61,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   enableAIMovement: 1
-  spawnInterval: 2
+  spawnInterval: 10
   maxUnits: 2
   targetPrefabs: []
   useRandomTargetSelection: 1
   retargetInterval: 10
+  targetHealth: {fileID: 828491680454788069, guid: 7c4f00ec1f9a8ba40a681e6c7fb980ea, type: 3}
+  proximityCheckInterval: 0.5
+  destroyOnReachTarget: 1
+  destructionDistance: 12
+  maxSearchRadius: 10
+  searchStepSize: 1
 --- !u!1 &7639478873681605478
 GameObject:
   m_ObjectHideFlags: 0
@@ -91,7 +97,7 @@ Transform:
   m_GameObject: {fileID: 7639478873681605478}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6, y: 0, z: 0}
+  m_LocalPosition: {x: 11, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -122,7 +128,7 @@ Transform:
   m_GameObject: {fileID: 8100887153982791174}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4, y: 0, z: 0}
+  m_LocalPosition: {x: 10, y: 1, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -150,7 +156,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_LocalPosition.z

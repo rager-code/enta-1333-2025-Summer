@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class SimpleHealth : MonoBehaviour
 {
     [SerializeField] private float maxHealth = 100f;
-    [SerializeField] private float currentHealth;
+    [SerializeField] public float currentHealth;
     [SerializeField] private Slider healthSlider;
     [SerializeField] private Camera mCamera;
     [SerializeField] private Transform healthBarTransform; // Reference to the health bar's transform
@@ -44,11 +44,15 @@ public class SimpleHealth : MonoBehaviour
         {
             Heal(50);
         }
-
+        
+        EnemyInCastle();
         // Make health bar look at camera
+        
+    }
+    private void LateUpdate()
+    {
         LookAtCamera();
     }
-
     private void LookAtCamera()
     {
         if (mCamera != null && healthBarTransform != null)
@@ -97,5 +101,13 @@ public class SimpleHealth : MonoBehaviour
         {
             healthSlider.value = currentHealth / maxHealth;
         }
+    }
+    public void EnemyInCastle()
+    {
+        if (Input.GetKeyUp(KeyCode.L))
+        {
+            TakeDamage(50);
+        }
+       
     }
 }

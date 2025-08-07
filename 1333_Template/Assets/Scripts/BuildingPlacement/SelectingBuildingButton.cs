@@ -19,7 +19,7 @@ public class SelectingBuildingButton : MonoBehaviour
         buildingPlacer = placer;
 
         buttonText.text = buildingDataForButton.BuildingName;
-
+        buttonImage.sprite = buildingDataForButton.BuildingIcon;
         // Clear any existing listeners to prevent duplicates
         button.onClick.RemoveAllListeners();
 

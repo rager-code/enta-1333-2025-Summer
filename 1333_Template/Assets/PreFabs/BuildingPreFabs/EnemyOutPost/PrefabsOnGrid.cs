@@ -29,7 +29,7 @@ public class PrefabsOnGrid : MonoBehaviour
 
     private void Start()
     {
-        if (spawnOnStart)
+        if (spawnOnStart != null)
         {
             StartCoroutine(SpawnPrefabsWhenGridReady());
         }
@@ -243,9 +243,19 @@ public class PrefabsOnGrid : MonoBehaviour
 
         if (startGridNode == null) return nodes;
 
-        // Calculate the starting grid position
-        Vector2Int startGridPos = GetGridPosition(startGridNode);
-        if (startGridPos.x == -1) return nodes; // Invalid position
+        // Calculate the starting grid position (this is now the CENTER of the prefab)
+        Vector2Int centerGridPos = GetGridPosition(startGridNode);
+        if (centerGridPos.x == -1) return nodes; // Invalid position
+
+        // Calculate offset to center the prefab
+        int halfWidth = prefabInfo.width / 2;
+        int halfHeight = prefabInfo.height / 2;
+
+        // Calculate the actual starting position (bottom-left corner of the prefab area)
+        Vector2Int startGridPos = new Vector2Int(
+            centerGridPos.x - halfWidth,
+            centerGridPos.y - halfHeight
+        );
 
         // Get all nodes in the width x height area
         for (int x = 0; x < prefabInfo.width; x++)

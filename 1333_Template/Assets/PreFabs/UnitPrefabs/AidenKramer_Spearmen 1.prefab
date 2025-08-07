@@ -53,6 +53,7 @@ MonoBehaviour:
   unitSkin: {fileID: 0}
   hurtParticles: {fileID: 0}
   vPath: {fileID: 0}
+  army: 0
   state: 0
 --- !u!114 &2695171682376178421
 MonoBehaviour:
@@ -80,10 +81,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  currentHealth: 0
+  currentHealth: 100
   healthSlider: {fileID: 6160156100274798466}
   mCamera: {fileID: 0}
-  healthBarTransform: {fileID: 0}
+  healthBarTransform: {fileID: 123061167957707810}
 --- !u!1001 &2299007954255271112
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -136,6 +137,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9500222, guid: 0755a95e2e1b5f44e8226989fb76f2cf, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 84b884e242aea8a4ebe56d6d5911125f, type: 2}
+    - target: {fileID: 9500222, guid: 0755a95e2e1b5f44e8226989fb76f2cf, type: 3}
+      propertyPath: m_WarningMessage
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -154,6 +163,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8425695836301005789}
     m_Modifications:
+    - target: {fileID: 645964677183883107, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645964677183883107, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 718382264663403461, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_Color.a
+      value: 0.45490196
+      objectReference: {fileID: 0}
     - target: {fileID: 4406048121314367796, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
       propertyPath: m_PresetInfoIsWorld
       value: 1
@@ -282,6 +303,18 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7826018939528090549, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.006056926
+      objectReference: {fileID: 0}
+    - target: {fileID: 7826018939528090549, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.9999817
+      objectReference: {fileID: 0}
+    - target: {fileID: 7826018939528090549, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180.694
+      objectReference: {fileID: 0}
     - target: {fileID: 8912842054488810616, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
       propertyPath: maxHealth
       value: 100
@@ -295,6 +328,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+--- !u!224 &123061167957707810 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4680074129157389658, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+  m_PrefabInstance: {fileID: 4703945923806916984}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &920854831422858393 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5584548690959341025, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31dbcf262c102b14d91b0f50ef597a3c, type: 3}
+  m_Name: Multipliers
+  m_EditorClassIdentifier: 
+  resourceProductionMultiplier: 4.7
+  resourceCapacityMultiplier: 3
+  resourceCostReduction: 1
+  damageBonus: 200
+  healthBonus: 1000
+  criticalHitMultiplier: 1
+  attackSpeedMultiplier: 1
+  armorBonus: 100
+  repairSpeedMultiplier: 3
+  providesShield: 1
+  shieldStrength: 100
+  effectRadius: 20
+  affectsNearbyBuildings: 0
+  affectsNearbyUnits: 0
+  stacksWithOtherMultipliers: 1
+  maxStackCount: 1

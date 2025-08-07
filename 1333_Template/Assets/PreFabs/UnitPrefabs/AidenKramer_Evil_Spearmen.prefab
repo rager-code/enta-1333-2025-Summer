@@ -53,6 +53,7 @@ MonoBehaviour:
   unitSkin: {fileID: 0}
   hurtParticles: {fileID: 0}
   vPath: {fileID: 0}
+  army: 1
   state: 0
 --- !u!114 &2695171682376178421
 MonoBehaviour:
@@ -66,7 +67,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a3fbd275c80b7e498fb911efc002743, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 15
+  moveSpeed: 5
 --- !u!114 &1750928824693806260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,10 +81,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  currentHealth: 0
+  currentHealth: 100
   healthSlider: {fileID: 1258765528908158241}
   mCamera: {fileID: 0}
-  healthBarTransform: {fileID: 0}
+  healthBarTransform: {fileID: 5242969891642740282}
 --- !u!1001 &379015010022464475
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -211,6 +212,26 @@ PrefabInstance:
     - target: {fileID: 7826018939528090549, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7826018939528090549, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7826018939528090549, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7826018939528090549, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7826018939528090549, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7826018939528090549, guid: 5f9f6dac1828f6a4a9c74f167bf98c98, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

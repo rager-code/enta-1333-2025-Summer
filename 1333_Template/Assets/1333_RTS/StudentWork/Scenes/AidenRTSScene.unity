@@ -886,7 +886,7 @@ MonoBehaviour:
   terrainParent: {fileID: 0}
   instantiatePrefabs: 1
   clearExistingPrefabs: 1
-  noiseScale: 0.1
+  noiseScale: 0.2
   waterThreshold: 0.3
   octaves: 4
   persistence: 0.6
@@ -894,12 +894,12 @@ MonoBehaviour:
   numberOfLakes: 1
   minLakeSize: 5
   maxLakeSize: 15
-  numberOfRivers: 2
-  riverLength: 30
+  numberOfRivers: 3
+  riverLength: 15
   riverWidth: 5
   generateTallGrass: 1
-  tallGrassSpawnChance: 0.25
-  maxTallGrassGroupSize: 10
+  tallGrassSpawnChance: 0.5
+  maxTallGrassGroupSize: 15
   tallGrassMaxAttempts: 500
   useRandomSeed: 1
   seed: 12345
@@ -969,7 +969,7 @@ MonoBehaviour:
   pathfindingLogic: {fileID: 961000933}
   startPosPrefab: {fileID: 6837061768053742933, guid: c041548ad5f52014d8ae27de23cf2764, type: 3}
   endPosPrefab: {fileID: 6837061768053742933, guid: c041548ad5f52014d8ae27de23cf2764, type: 3}
-  movingAgent: {fileID: 0}
+  movingAgent: {fileID: 6837061768053742933, guid: c041548ad5f52014d8ae27de23cf2764, type: 3}
   searchDelay: 0
 --- !u!1 &566270075
 GameObject:
@@ -1079,7 +1079,7 @@ Transform:
   m_GameObject: {fileID: 719956513}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1099,8 +1099,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabsToSpawn:
   - prefab: {fileID: 8990080377736291917, guid: a5930922ee5e86745943fcd99916771f, type: 3}
-    width: 20
-    height: 20
+    width: 11
+    height: 12
     spawnWeight: 10
   numberOfPrefabsToSpawn: 1
   spawnOnStart: 1
@@ -1129,7 +1129,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 726750517}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0003d0d249a8403459c3b7fe4d71b575, type: 3}
   m_Name: 
@@ -1755,6 +1755,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridManager: {fileID: 1975170954}
+  destinationThreshold: 0.5
 --- !u!1 &987334929
 GameObject:
   m_ObjectHideFlags: 0
@@ -1771,7 +1772,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &987334930
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2005,10 +2006,10 @@ MonoBehaviour:
     unwalkableHeight: 7
     maxBuildingOfType: 1
   - prefab: {fileID: 5287982606913193149, guid: 7c4f00ec1f9a8ba40a681e6c7fb980ea, type: 3}
-    buildingWidth: 0
-    buildingHeight: 0
-    unwalkableWidth: 0
-    unwalkableHeight: 0
+    buildingWidth: 7
+    buildingHeight: 7
+    unwalkableWidth: 7
+    unwalkableHeight: 7
     maxBuildingOfType: 1
   - prefab: {fileID: 6041842344366963134, guid: a944170b0f2404f40a5c9c844f4285f8, type: 3}
     buildingWidth: 0
@@ -3321,6 +3322,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 20
+--- !u!114 &1735850181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1735850175}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cda6b387049155843b025d589e48c00d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitPrefab: {fileID: 0}
+  unitsToSpawn: 5
+  spawnDelay: 5
+  spawnAreaCenter: {x: 0, y: 0, z: 0}
+  spawnRadius: 5
+  gridManager: {fileID: 1975170954}
+  commandTargetPath: {fileID: 726750518}
+  spawnOnStart: 1
+  drawSpawnArea: 1
 --- !u!1 &1940952456
 GameObject:
   m_ObjectHideFlags: 0
@@ -3624,17 +3646,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2067201515}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.486, y: 1.486, z: 1.486}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1329062390}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 796, y: 481}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 707, y: 455}
+  m_SizeDelta: {x: -1820, y: -980}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2067201517
 MonoBehaviour:
@@ -3949,11 +3971,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 874600325141603498, guid: 0613d94e270e22d49a3c54eb290cab30, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 874600325141603498, guid: 0613d94e270e22d49a3c54eb290cab30, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 25
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 874600325141603498, guid: 0613d94e270e22d49a3c54eb290cab30, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3990,6 +4012,10 @@ PrefabInstance:
     - target: {fileID: 2429256239093108479, guid: 0613d94e270e22d49a3c54eb290cab30, type: 3}
       propertyPath: m_Name
       value: Main Camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 3943042814017100946, guid: 0613d94e270e22d49a3c54eb290cab30, type: 3}
+      propertyPath: field of view
+      value: 80
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4074,13 +4100,17 @@ PrefabInstance:
       propertyPath: commandTargetPath
       value: 
       objectReference: {fileID: 726750518}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7207207253690854649, guid: e1018d058f821dd4db41220730ec5f4d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5561374183498257357, guid: e1018d058f821dd4db41220730ec5f4d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1735850178}
+    - targetCorrespondingSourceObject: {fileID: 5561374183498257357, guid: e1018d058f821dd4db41220730ec5f4d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1735850181}
   m_SourcePrefab: {fileID: 100100000, guid: e1018d058f821dd4db41220730ec5f4d, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

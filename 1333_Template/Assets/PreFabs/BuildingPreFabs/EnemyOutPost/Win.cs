@@ -5,8 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class Win : MonoBehaviour
 {
-    [SerializeField] private string sceneName = "Win";
-
     private void OnDestroy()
     {
         if (Application.isPlaying)

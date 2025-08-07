@@ -9,7 +9,7 @@ using UnityEngine;
             Melee = 0,
             Range = 1,
             Magic = 2,
-}
+        }
 
 
     // Start is called before the first frame update

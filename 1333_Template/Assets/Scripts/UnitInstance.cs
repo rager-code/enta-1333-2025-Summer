@@ -11,7 +11,8 @@ public class UnitInstance : UnitBase
     [SerializeField] private ParticleSystem hurtParticles; // hit feedback
     [SerializeField] public VisualTargetPath vPath; // draws the path visually ----was visual path
 
-    
+    [Header("Army Assignment")]
+    [SerializeField] public Army army = Army.Army1;
 
     private GridManager gridManager;
     protected AStarPathfinding pathfinder;
@@ -25,10 +26,6 @@ public class UnitInstance : UnitBase
     public bool IsMoving => isMoving;
     public List<GridNode> CurrentPath => currentPath;
 
-    
-   
-
-
     public void Initialize(AStarPathfinding pathfinder, UnitType unitType, GridManager grid, VisualTargetPath pathFinderVis)
     {
         // assign dependencies at runtime from army manager
@@ -36,6 +33,7 @@ public class UnitInstance : UnitBase
         base.unitType = unitType;
         gridManager = grid;
         this.vPath = pathFinderVis;
+        //vPath = FindFirstObjectByType<VisualTargetPath>();
     }
 
     public override void MoveTo(GridNode targetNode)
@@ -46,10 +44,7 @@ public class UnitInstance : UnitBase
 
         StartCoroutine(vPath.GeneratePathTo(targetNode, this));
 
-
-
-
-
+        transform.LookAt(targetNode.WorldPosition);
 
         // validate input
         if (pathfinder == null || targetNode == null)
@@ -60,7 +55,6 @@ public class UnitInstance : UnitBase
 
         // find the start node from current world position
         GridNode startNode = gridManager.GetNodeFromWorldPosition(transform.position);
-
 
         // generate A* path for the uunit to follow
         int unitWidth = unitType.Width;    // example - ensure these exist
@@ -89,7 +83,6 @@ public class UnitInstance : UnitBase
         {
             Debug.LogWarning($"{name} could not find path to target.");
         }
-
     }
 
     public void StartPathMovement(List<GridNode> path)
@@ -155,11 +148,36 @@ public class UnitInstance : UnitBase
         }
     }
 
+    private void CheckProximityDestroy()
+    {
+        var allUnits = FindObjectsOfType<UnitInstance>();
+
+        foreach (var unit in allUnits)
+        {
+            if (unit != this && unit.army != this.army)
+            {
+                float distance = Vector3.Distance(transform.position, unit.transform.position);
+
+                if (distance <= 3f) // 3 units distance
+                {
+                    Debug.Log("3 Node  Distance Works  / damage both units or destroy");
+                    Destroy(gameObject);
+                    return;
+                }
+            }
+        }
+    }
+    public void Update()
+    {
+        CheckProximityDestroy();
+    }
     public override void PerTick()
     {
         // called by the RTS update manager
         if (state == UnitState.Moving)
             DoMove();
+
+        //CheckProximityDestroy();
     }
 
     public void Select()
@@ -175,4 +193,10 @@ public class UnitInstance : UnitBase
         // unitSkin.material.color = Color.white;
         Debug.Log($"{name} deselected.");
     }
+}
+
+public enum Army
+{
+    Army1,
+    Army2
 }

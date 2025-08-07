@@ -86,6 +86,7 @@ public class BarracksSpawner : MonoBehaviour
         {
             ClearMyUnits();
         }
+        
     }
    
 
@@ -186,7 +187,7 @@ public class BarracksSpawner : MonoBehaviour
         if (targetNode != null)
         {
             unit.MoveTo(targetNode);
-            Debug.Log($"Spawned new unit {unit.name} and moving to {targetNode}");
+            Debug.Log($"Spawned new unit {newUnit.name} and moving to {targetNode}");
         }
         else
         {
@@ -229,21 +230,7 @@ public class BarracksSpawner : MonoBehaviour
         Debug.Log($"Click to move: {(enabled ? "Enabled" : "Disabled")}");
     }
 
-    // Optional: Method to get all currently active units from ALL barracks
-    public static List<UnitInstance> GetAllActiveUnits()
-    {
-        allUnits.RemoveAll(unit => unit == null);
-        return new List<UnitInstance>(allUnits);
-    }
-
-    // Optional: Method to get units from THIS barracks only
-    public List<UnitInstance> GetMyUnits()
-    {
-        myUnits.RemoveAll(unit => unit == null);
-        return new List<UnitInstance>(myUnits);
-    }
-
-    // Optional: Method to clear all units from ALL barracks
+   
     public static void ClearAllUnits()
     {
         foreach (UnitInstance unit in allUnits)

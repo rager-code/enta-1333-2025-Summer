@@ -5,13 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class GameOver : MonoBehaviour
 {
-    [SerializeField] private string sceneName = "Lose";
+    
 
     private void OnDestroy()
     {
         if (Application.isPlaying)
         {
-            SceneManager.LoadScene("Lose");
+            SceneManager.LoadScene("GameOver");
         }
     }
+  
 }

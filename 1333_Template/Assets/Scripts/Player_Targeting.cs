@@ -26,7 +26,7 @@ public class Player_Targeting : MonoBehaviour
         }
         // Reset velocity/animation here if you want
     }
-
+    
     private IEnumerator MoveAlongPath(List<GridNode> path)
     {
         foreach (GridNode node in path)
